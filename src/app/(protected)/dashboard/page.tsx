@@ -1,12 +1,14 @@
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
+  const t = await getTranslations("dashboard");
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) redirect("/login");
 
@@ -55,45 +57,44 @@ export default async function DashboardPage() {
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-12">
-      <h1 className="text-3xl font-bold text-neu-text mb-2">Dashboard</h1>
+      <h1 className="text-3xl font-bold text-neu-text mb-2">{t("title")}</h1>
       <p className="text-neu-muted mb-8">
-        Welcome back, {session.user.name || session.user.email}!
+        {t("welcome")}, {session.user.name || session.user.email}!
       </p>
 
       {isTrialing && (
         <div className="rounded-2xl shadow-neu-sm p-6 mb-6 border-l-4 border-blue-400 bg-neu-bg">
-          <h2 className="font-semibold text-neu-text mb-1">Free Trial Active</h2>
+          <h2 className="font-semibold text-neu-text mb-1">{t("freeTrialActive")}</h2>
           <p className="text-neu-muted text-sm">
-            {trialDaysLeft} day{trialDaysLeft !== 1 ? "s" : ""} remaining in your trial.
-            Your card will be charged after the trial ends.
+            {t("trialDaysRemaining", { count: trialDaysLeft })}
           </p>
         </div>
       )}
 
       {isPastDueWithGrace && (
         <div className="rounded-2xl shadow-neu-sm p-6 mb-6 border-l-4 border-red-400 bg-neu-bg">
-          <h2 className="font-semibold text-red-600 mb-1">Payment Failed</h2>
+          <h2 className="font-semibold text-red-600 mb-1">{t("paymentFailed")}</h2>
           <p className="text-neu-muted text-sm mb-3">
-            Your last payment failed. Please update your payment method within 3 days to keep access.
+            {t("paymentFailedDesc")}
           </p>
-          <SubscribeButton label="Update Payment" />
+          <SubscribeButton label={t("updatePayment")} />
         </div>
       )}
 
       {!hasActiveSubscription && (
         <div className="rounded-2xl shadow-neu-sm p-6 mb-8 border-l-4 border-amber-400 bg-neu-bg">
           <h2 className="font-semibold text-neu-text mb-2">
-            Subscription Required
+            {t("subscriptionRequired")}
           </h2>
           <p className="text-neu-muted text-sm mb-4">
-            You need an active subscription to access the setup guide.
+            {t("subscriptionRequiredDesc")}
           </p>
-          <PlanSelector />
+          <PlanSelector monthlyLabel={t("subscribeMonthly")} annualLabel={t("subscribeAnnual")} />
         </div>
       )}
 
       <h2 className="text-xl font-semibold text-neu-text mb-4">
-        Choose Your Setup Scenario
+        {t("chooseScenario")}
       </h2>
 
       <div className="grid md:grid-cols-2 gap-6">
@@ -162,7 +163,7 @@ export default async function DashboardPage() {
                     href={nextStep ? `/instruction/${scenario.slug}/${nextStep.slug}` : `/instruction/${scenario.slug}`}
                     className="inline-block neu-btn-primary rounded-full px-6 py-2.5 text-sm"
                   >
-                    {completedSteps > 0 ? "Continue" : "Start"}
+                    {completedSteps > 0 ? t("continue") : t("start")}
                   </Link>
                   {completedSteps > 0 && nextStep && percentage < 100 && (
                     <p className="text-xs text-neu-muted mt-2">
@@ -172,7 +173,7 @@ export default async function DashboardPage() {
                 </div>
               ) : (
                 <span className="text-neu-muted text-sm">
-                  Subscribe to access
+                  {t("subscribeToAccess")}
                 </span>
               )}
             </div>
@@ -181,7 +182,7 @@ export default async function DashboardPage() {
 
         {scenarios.length === 0 && (
           <div className="col-span-2 text-center py-12 text-neu-muted">
-            <p>No scenarios available yet. Content is being prepared.</p>
+            <p>{t("noScenarios")}</p>
           </div>
         )}
       </div>
@@ -189,7 +190,7 @@ export default async function DashboardPage() {
   );
 }
 
-function SubscribeButton({ label, plan = "monthly" }: { label?: string; plan?: "monthly" | "annual" }) {
+function SubscribeButton({ label, plan = "monthly" }: { label: string; plan?: "monthly" | "annual" }) {
   return (
     <form
       action={async () => {
@@ -212,17 +213,17 @@ function SubscribeButton({ label, plan = "monthly" }: { label?: string; plan?: "
         type="submit"
         className="neu-btn-primary rounded-full px-6 py-2.5 text-sm"
       >
-        {label || (plan === "annual" ? "Subscribe — $278/year (save 20%)" : "Subscribe — $29/month")}
+        {label}
       </button>
     </form>
   );
 }
 
-function PlanSelector() {
+function PlanSelector({ monthlyLabel, annualLabel }: { monthlyLabel: string; annualLabel: string }) {
   return (
     <div className="flex flex-col sm:flex-row gap-3">
-      <SubscribeButton plan="monthly" />
-      <SubscribeButton plan="annual" />
+      <SubscribeButton plan="monthly" label={monthlyLabel} />
+      <SubscribeButton plan="annual" label={annualLabel} />
     </div>
   );
 }

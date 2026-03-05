@@ -1,6 +1,11 @@
+"use client";
+
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 
 export default function Footer() {
+  const t = useTranslations("footer");
+
   return (
     <footer className="bg-neu-bg mt-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -14,47 +19,47 @@ export default function Footer() {
                 <span className="font-bold text-lg text-neu-text">ClawSetup</span>
               </div>
               <p className="text-neu-muted text-sm leading-relaxed">
-                Interactive step-by-step guide for setting up OpenClaw with AI-powered assistance.
+                {t("description")}
               </p>
             </div>
             <div>
-              <h3 className="font-semibold text-neu-text mb-3">Product</h3>
+              <h3 className="font-semibold text-neu-text mb-3">{t("product")}</h3>
               <ul className="space-y-2 text-sm text-neu-muted">
                 <li>
                   <Link href="/#features" className="hover:text-neu-text transition-colors duration-200">
-                    Features
+                    {t("features")}
                   </Link>
                 </li>
                 <li>
                   <Link href="/#pricing" className="hover:text-neu-text transition-colors duration-200">
-                    Pricing
+                    {t("pricing")}
                   </Link>
                 </li>
                 <li>
                   <Link href="/#faq" className="hover:text-neu-text transition-colors duration-200">
-                    FAQ
+                    {t("faq")}
                   </Link>
                 </li>
               </ul>
             </div>
             <div>
-              <h3 className="font-semibold text-neu-text mb-3">Legal</h3>
+              <h3 className="font-semibold text-neu-text mb-3">{t("legal")}</h3>
               <ul className="space-y-2 text-sm text-neu-muted">
                 <li>
                   <Link href="/terms" className="hover:text-neu-text transition-colors duration-200">
-                    Terms of Service
+                    {t("terms")}
                   </Link>
                 </li>
                 <li>
                   <Link href="/privacy" className="hover:text-neu-text transition-colors duration-200">
-                    Privacy Policy
+                    {t("privacy")}
                   </Link>
                 </li>
               </ul>
             </div>
           </div>
           <div className="mt-8 pt-8 border-t border-neu-dark/20 text-center text-sm text-neu-muted">
-            &copy; {new Date().getFullYear()} ClawSetup. All rights reserved.
+            &copy; {new Date().getFullYear()} ClawSetup. {t("rights")}
           </div>
         </div>
       </div>

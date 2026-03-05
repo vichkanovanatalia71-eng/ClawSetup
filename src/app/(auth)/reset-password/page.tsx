@@ -4,16 +4,20 @@ import Link from "next/link";
 import { Suspense, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
+import { useTranslations } from "next-intl";
 
 export default function ResetPasswordPage() {
+  const tc = useTranslations("common");
   return (
-    <Suspense fallback={<div className="min-h-[80vh] flex items-center justify-center text-neu-muted">Loading...</div>}>
+    <Suspense fallback={<div className="min-h-[80vh] flex items-center justify-center text-neu-muted">{tc("loading")}</div>}>
       <ResetPasswordForm />
     </Suspense>
   );
 }
 
 function ResetPasswordForm() {
+  const t = useTranslations("auth");
+  const tc = useTranslations("common");
   const searchParams = useSearchParams();
   const token = searchParams.get("token") || "";
   const [password, setPassword] = useState("");
@@ -27,7 +31,7 @@ function ResetPasswordForm() {
     setError("");
 
     if (password !== confirmPassword) {
-      setError("Passwords do not match");
+      setError(t("passwordsNoMatch"));
       return;
     }
 
@@ -43,12 +47,12 @@ function ResetPasswordForm() {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error || "Something went wrong");
+        setError(data.error || t("somethingWrong"));
       } else {
         setSuccess(true);
       }
     } catch {
-      setError("Network error. Please try again.");
+      setError(t("networkError"));
     }
 
     setLoading(false);
@@ -58,10 +62,10 @@ function ResetPasswordForm() {
     return (
       <div className="min-h-[80vh] flex items-center justify-center px-4">
         <div className="rounded-2xl shadow-neu p-8 bg-neu-bg text-center max-w-md">
-          <h1 className="text-2xl font-bold text-neu-text mb-2">Invalid Link</h1>
-          <p className="text-neu-muted text-sm mb-6">This password reset link is invalid or has expired.</p>
+          <h1 className="text-2xl font-bold text-neu-text mb-2">{t("invalidLink")}</h1>
+          <p className="text-neu-muted text-sm mb-6">{t("invalidLinkDescription")}</p>
           <Link href="/forgot-password" className="text-brand-600 hover:text-brand-700 font-medium text-sm">
-            Request a new one
+            {t("requestNewOne")}
           </Link>
         </div>
       </div>
@@ -84,18 +88,18 @@ function ResetPasswordForm() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
               </div>
-              <h1 className="text-2xl font-bold text-neu-text mb-2">Password Reset!</h1>
+              <h1 className="text-2xl font-bold text-neu-text mb-2">{t("passwordReset")}</h1>
               <p className="text-neu-muted text-sm mb-6">
-                Your password has been reset successfully.
+                {t("passwordResetSuccess")}
               </p>
               <Link href="/login" className="neu-btn-primary rounded-full px-8 py-3 inline-block">
-                Sign In
+                {tc("signIn")}
               </Link>
             </div>
           ) : (
             <>
               <h1 className="text-2xl font-bold text-neu-text text-center mb-8">
-                Set New Password
+                {t("setNewPassword")}
               </h1>
 
               {error && (
@@ -106,7 +110,7 @@ function ResetPasswordForm() {
 
               <form onSubmit={handleSubmit} className="space-y-5">
                 <div>
-                  <label className="block text-sm font-medium text-neu-muted mb-2">New Password</label>
+                  <label className="block text-sm font-medium text-neu-muted mb-2">{t("newPassword")}</label>
                   <input
                     type="password"
                     value={password}
@@ -114,18 +118,18 @@ function ResetPasswordForm() {
                     required
                     minLength={8}
                     className="neu-input w-full"
-                    placeholder="Min. 8 chars, uppercase, lowercase, number"
+                    placeholder={t("newPasswordPlaceholder")}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-neu-muted mb-2">Confirm Password</label>
+                  <label className="block text-sm font-medium text-neu-muted mb-2">{t("confirmPassword")}</label>
                   <input
                     type="password"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     required
                     className="neu-input w-full"
-                    placeholder="Repeat your password"
+                    placeholder={t("confirmPasswordPlaceholder")}
                   />
                 </div>
                 <motion.button
@@ -134,7 +138,7 @@ function ResetPasswordForm() {
                   whileTap={{ scale: 0.97 }}
                   className="w-full neu-btn-primary rounded-full py-3 text-base disabled:opacity-50"
                 >
-                  {loading ? "Resetting..." : "Reset Password"}
+                  {loading ? t("resetting") : t("resetPassword")}
                 </motion.button>
               </form>
             </>

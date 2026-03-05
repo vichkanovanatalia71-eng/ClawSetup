@@ -2,8 +2,10 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import { useTranslations } from "next-intl";
 
 export default function FeedbackWidget({ stepId }: { stepId: string }) {
+  const t = useTranslations("instruction");
   const [submitted, setSubmitted] = useState(false);
 
   useEffect(() => {
@@ -30,7 +32,7 @@ export default function FeedbackWidget({ stepId }: { stepId: string }) {
 
   return (
     <div className="rounded-2xl shadow-neu-sm p-4 bg-neu-bg text-center mt-8">
-      <p className="text-sm text-neu-muted mb-3">Was this step helpful?</p>
+      <p className="text-sm text-neu-muted mb-3">{t("feedbackQuestion")}</p>
       {submitted ? (
         <p className="text-sm text-green-600 font-medium">
           Thanks for your feedback!

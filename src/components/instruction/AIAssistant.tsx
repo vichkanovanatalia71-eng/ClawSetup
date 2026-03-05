@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeSanitize from "rehype-sanitize";
+import { useTranslations } from "next-intl";
 
 function formatCitations(text: string): string {
   return text.replace(
@@ -34,18 +35,19 @@ interface ChatMessage {
   timestamp: Date;
 }
 
-const quickActions = [
-  { id: "explain_simpler", label: "Explain simpler" },
-  { id: "check_missed", label: "What did I miss?" },
-  { id: "alternative", label: "Alternative way" },
-  { id: "generate_command", label: "Give me commands" },
-  { id: "whats_next", label: "What's next?" },
-  { id: "explain_error", label: "Fix my error" },
-  { id: "check_output", label: "Check output" },
-  { id: "security_tip", label: "Security tips" },
-];
+const quickActionKeys = [
+  { id: "explain_simpler", key: "quickExplain" },
+  { id: "check_missed", key: "quickMissed" },
+  { id: "alternative", key: "quickAlternative" },
+  { id: "generate_command", key: "quickCommands" },
+  { id: "whats_next", key: "quickNext" },
+  { id: "explain_error", key: "quickFix" },
+  { id: "check_output", key: "quickCheck" },
+  { id: "security_tip", key: "quickSecurity" },
+] as const;
 
 export default function AIAssistant({ stepId }: AIAssistantProps) {
+  const t = useTranslations("instruction");
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -103,7 +105,7 @@ export default function AIAssistant({ stepId }: AIAssistantProps) {
     const userMsg: ChatMessage = {
       role: "user",
       content: quickAction
-        ? `[${quickActions.find((a) => a.id === quickAction)?.label}]`
+        ? `[${t(quickActionKeys.find((a) => a.id === quickAction)?.key ?? "quickExplain")}]`
         : message,
       timestamp: new Date(),
     };
@@ -236,7 +238,7 @@ export default function AIAssistant({ stepId }: AIAssistantProps) {
     <div className="w-80 flex-shrink-0 flex flex-col bg-neu-bg m-2 rounded-2xl shadow-neu-sm">
       <div className="p-4 border-b border-neu-dark/15">
         <div className="flex items-center justify-between">
-          <h3 className="font-semibold text-neu-text text-sm">AI Assistant</h3>
+          <h3 className="font-semibold text-neu-text text-sm">{t("aiTitle")}</h3>
           <div className="flex items-center gap-2">
             {remaining !== null && (
               <span className="text-xs text-neu-muted">{remaining} left</span>
@@ -257,13 +259,13 @@ export default function AIAssistant({ stepId }: AIAssistantProps) {
           </div>
         </div>
         <p className="text-xs text-neu-muted mt-1">
-          Ask about this step or upload a screenshot of an error
+          {t("aiDescription")}
         </p>
       </div>
 
       {/* Quick actions */}
       <div role="toolbar" aria-label="Quick actions" className="p-3 border-b border-neu-dark/10 flex flex-wrap gap-1.5">
-        {quickActions.map((action) => (
+        {quickActionKeys.map((action) => (
           <motion.button
             key={action.id}
             whileTap={{ scale: 0.95 }}
@@ -271,7 +273,7 @@ export default function AIAssistant({ stepId }: AIAssistantProps) {
             disabled={loading}
             className="px-3 py-1.5 rounded-full text-xs font-medium shadow-neu-xs text-brand-600 hover:shadow-neu-inset-sm transition-all duration-200 disabled:opacity-50"
           >
-            {action.label}
+            {t(action.key)}
           </motion.button>
         ))}
       </div>
@@ -365,13 +367,13 @@ export default function AIAssistant({ stepId }: AIAssistantProps) {
         {loading && !streamingContent && (
           <div role="status" aria-live="polite" className="flex items-center gap-2 text-neu-muted text-sm">
             <div className="animate-spin w-4 h-4 border-2 border-neu-dark border-t-brand-500 rounded-full" aria-hidden="true" />
-            Analyzing...
+            {t("analyzing")}
           </div>
         )}
         {/* Escalation: show after 3+ assistant messages */}
         {messages.filter((m) => m.role === "assistant").length >= 3 && !loading && (
           <div className="rounded-xl shadow-neu-xs p-3 text-center">
-            <p className="text-xs text-neu-muted mb-2">Still stuck?</p>
+            <p className="text-xs text-neu-muted mb-2">{t("stillStuck")}</p>
             <motion.button
               whileTap={{ scale: 0.95 }}
               onClick={() => {
@@ -389,7 +391,7 @@ export default function AIAssistant({ stepId }: AIAssistantProps) {
               }}
               className="px-4 py-1.5 rounded-full text-xs font-medium shadow-neu-xs text-amber-600 hover:shadow-neu-inset-sm transition-all"
             >
-              Create Support Ticket
+              {t("createTicket")}
             </motion.button>
           </div>
         )}
@@ -471,7 +473,7 @@ export default function AIAssistant({ stepId }: AIAssistantProps) {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && sendMessage(input)}
-            placeholder="Describe your error..."
+            placeholder={t("aiPlaceholder")}
             disabled={loading}
             className="neu-input flex-1 !py-2.5 text-sm disabled:opacity-50"
           />

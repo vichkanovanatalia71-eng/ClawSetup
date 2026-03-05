@@ -3,94 +3,15 @@
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
-
-const benefits = [
-  "Fully configured VM on Google Cloud for OpenClaw (Ubuntu 24.04)",
-  "Stable SSH access with host key management explained",
-  "Proper Service Account + IAM roles + Access scopes (no more 403 errors)",
-  "Vertex AI authorization via ADC without JSON service-account keys",
-  "Node.js 22+ and OpenClaw installed via npm without root issues",
-  "OpenClaw gateway as a systemd user service with auto-start after reboot",
-  "Telegram bot connected via onboard + pairing for remote control",
-  "Dashboard access via SSH tunnel (no open ports to the internet)",
-  "Autonomy controls: sudo whitelist for bot install/deploy operations",
-  "VM backup and restore (snapshots / machine images) for safe experimentation",
-];
-
-const steps = [
-  { num: "0", title: "GCP Project Setup", desc: "Billing, APIs, Service Account, IAM roles" },
-  { num: "1", title: "Create VM", desc: "Ubuntu 24.04, 2 vCPU + 4GB, static IP" },
-  { num: "2", title: "SSH Access", desc: "Key generation, connection, host key management" },
-  { num: "3-6", title: "Install Stack", desc: "Ubuntu packages, gcloud, ADC, Node.js, OpenClaw" },
-  { num: "7-9", title: "Configure", desc: "Env file, gateway service, auto-start" },
-  { num: "10-12", title: "Integrate", desc: "Onboard, Telegram bot, pairing" },
-  { num: "13-17", title: "Operate", desc: "Dashboard, diagnostics, security, backups" },
-];
-
-const testimonials = [
-  {
-    name: "Oleksiy K.",
-    role: "DevOps Engineer",
-    quote: "I spent 3 days trying to set up OpenClaw from docs alone. With this guide, everything worked in 4 hours. The AI assistant saved me at least twice when I hit permission errors.",
-  },
-  {
-    name: "Sarah M.",
-    role: "Full Stack Developer",
-    quote: "The step-by-step format with copy-paste commands is exactly what I needed. No guessing, no ambiguity. The screenshot analysis feature is magic.",
-  },
-  {
-    name: "Andrii P.",
-    role: "Cloud Architect",
-    quote: "Even as someone experienced with GCP, I found value in the guide. The security best practices and systemd service configuration were spot-on.",
-  },
-  {
-    name: "Maria L.",
-    role: "Startup Founder",
-    quote: "Worth every penny. I had zero Linux experience and now I have a fully running AI agent on Google Cloud. The progress tracking kept me motivated.",
-  },
-];
-
-const faqs = [
-  {
-    q: "What is OpenClaw?",
-    a: "OpenClaw is an AI agent that can be deployed locally or on a remote server. It integrates with various services (Telegram, Vertex AI, OpenAI) and can be managed through a web dashboard or Telegram bot.",
-  },
-  {
-    q: "Do I need prior experience with Google Cloud or Linux?",
-    a: "No! This guide is designed for complete beginners. Every step is explained in detail, with copy-paste commands and troubleshooting for common errors.",
-  },
-  {
-    q: "What does the AI assistant do?",
-    a: "On each step, you can paste error text or upload a screenshot. The AI analyzes your specific issue in the context of that step and gives you exact commands or configuration changes to fix it.",
-  },
-  {
-    q: "Can I cancel my subscription anytime?",
-    a: "Yes, you can cancel in one click from your profile. You'll keep access until the end of your paid period.",
-  },
-  {
-    q: "What if I break my VM?",
-    a: "The guide teaches you to create snapshots before risky changes. You can restore your VM to a working state in 5-10 minutes.",
-  },
-  {
-    q: "Is there a local setup option?",
-    a: "Yes, the guide covers both remote (Google Cloud VM) and local installation scenarios.",
-  },
-];
-
-const pricingFeatures = [
-  "Full interactive guide (local + remote)",
-  "AI assistant on every step",
-  "Screenshot error analysis",
-  "Progress saving & checklists",
-  "Cancel anytime in one click",
-];
+import { useTranslations } from "next-intl";
 
 function PricingToggle() {
   const [annual, setAnnual] = useState(false);
+  const t = useTranslations("landing");
   return (
     <div>
       <div className="flex items-center justify-center gap-3 mb-8">
-        <span className={`text-sm ${!annual ? "text-neu-text font-medium" : "text-neu-muted"}`}>Monthly</span>
+        <span className={`text-sm ${!annual ? "text-neu-text font-medium" : "text-neu-muted"}`}>{t("pricingMonthly")}</span>
         <button
           onClick={() => setAnnual(!annual)}
           className={`relative w-14 h-7 rounded-full transition-colors duration-200 ${annual ? "bg-brand-500" : "shadow-neu-inset-sm bg-neu-bg"}`}
@@ -102,7 +23,7 @@ function PricingToggle() {
           />
         </button>
         <span className={`text-sm ${annual ? "text-neu-text font-medium" : "text-neu-muted"}`}>
-          Annual <span className="text-green-600 text-xs font-medium">save 20%</span>
+          {t("pricingAnnual")} <span className="text-green-600 text-xs font-medium">{t("pricingSave")}</span>
         </span>
       </div>
       <div className="max-w-lg mx-auto">
@@ -117,28 +38,28 @@ function PricingToggle() {
               transition={{ duration: 0.2 }}
             >
               <h3 className="text-xl font-bold text-neu-text mb-2">
-                {annual ? "Annual Access" : "Monthly Access"}
+                {annual ? t("pricingAnnualAccess") : t("pricingMonthlyAccess")}
               </h3>
               <div className="flex items-baseline gap-2 mb-6">
                 <span className="text-5xl font-bold text-neu-text">
                   {annual ? "$278" : "$29"}
                 </span>
-                <span className="text-neu-muted">{annual ? "/year" : "/month"}</span>
+                <span className="text-neu-muted">{annual ? t("pricingYear") : t("pricingMonth")}</span>
                 {annual && (
-                  <span className="text-sm text-green-600 font-medium ml-2">~$23/mo</span>
+                  <span className="text-sm text-green-600 font-medium ml-2">{t("pricingApprox")}</span>
                 )}
               </div>
             </motion.div>
           </AnimatePresence>
           <ul className="space-y-3 mb-8">
-            {pricingFeatures.map((f) => (
-              <li key={f} className="flex gap-3 text-neu-text text-sm">
+            {[0, 1, 2, 3, 4].map((i) => (
+              <li key={i} className="flex gap-3 text-neu-text text-sm">
                 <div className="w-5 h-5 rounded-md shadow-neu-inset-sm flex items-center justify-center flex-shrink-0">
                   <svg className="w-3 h-3 text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                   </svg>
                 </div>
-                {f}
+                {t(`pricingFeature${i}`)}
               </li>
             ))}
           </ul>
@@ -146,7 +67,7 @@ function PricingToggle() {
             href="/register"
             className="block w-full neu-btn-primary rounded-full text-center py-3.5 text-base"
           >
-            Get Started
+            {t("startNow")}
           </Link>
         </div>
       </div>
@@ -154,7 +75,7 @@ function PricingToggle() {
   );
 }
 
-function FAQItem({ faq }: { faq: { q: string; a: string } }) {
+function FAQItem({ q, a }: { q: string; a: string }) {
   const [open, setOpen] = useState(false);
   return (
     <div className="rounded-2xl shadow-neu-sm bg-neu-bg overflow-hidden">
@@ -162,7 +83,7 @@ function FAQItem({ faq }: { faq: { q: string; a: string } }) {
         onClick={() => setOpen(!open)}
         className="w-full flex justify-between items-center px-6 py-5 text-left"
       >
-        <span className="font-semibold text-neu-text">{faq.q}</span>
+        <span className="font-semibold text-neu-text">{q}</span>
         <motion.svg
           animate={{ rotate: open ? 180 : 0 }}
           transition={{ duration: 0.2 }}
@@ -182,7 +103,7 @@ function FAQItem({ faq }: { faq: { q: string; a: string } }) {
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.2 }}
           >
-            <p className="px-6 pb-5 text-neu-muted text-sm leading-relaxed">{faq.a}</p>
+            <p className="px-6 pb-5 text-neu-muted text-sm leading-relaxed">{a}</p>
           </motion.div>
         )}
       </AnimatePresence>
@@ -195,30 +116,48 @@ const sectionVariants = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
 };
 
-const howToSchema = {
-  "@context": "https://schema.org",
-  "@type": "HowTo",
-  name: "Set Up OpenClaw AI Agent",
-  description: "Interactive step-by-step guide to set up OpenClaw on Google Cloud or locally.",
-  step: steps.map((s, i) => ({
-    "@type": "HowToStep",
-    position: i + 1,
-    name: s.title,
-    text: s.desc,
-  })),
-};
-
-const faqSchema = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  mainEntity: faqs.map((f) => ({
-    "@type": "Question",
-    name: f.q,
-    acceptedAnswer: { "@type": "Answer", text: f.a },
-  })),
-};
-
 export default function LandingPage() {
+  const t = useTranslations("landing");
+
+  const benefits = Array.from({ length: 10 }, (_, i) => t(`benefit${i}`));
+  const steps = Array.from({ length: 7 }, (_, i) => ({
+    num: t(`step${i}num`),
+    title: t(`step${i}title`),
+    desc: t(`step${i}desc`),
+  }));
+  const testimonials = Array.from({ length: 4 }, (_, i) => ({
+    name: t(`testimonial${i}name`),
+    role: t(`testimonial${i}role`),
+    quote: t(`testimonial${i}quote`),
+  }));
+  const faqs = Array.from({ length: 6 }, (_, i) => ({
+    q: t(`faq${i}q`),
+    a: t(`faq${i}a`),
+  }));
+
+  const howToSchema = {
+    "@context": "https://schema.org",
+    "@type": "HowTo",
+    name: "Set Up OpenClaw AI Agent",
+    description: "Interactive step-by-step guide to set up OpenClaw on Google Cloud or locally.",
+    step: steps.map((s, i) => ({
+      "@type": "HowToStep",
+      position: i + 1,
+      name: s.title,
+      text: s.desc,
+    })),
+  };
+
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqs.map((f) => ({
+      "@type": "Question",
+      name: f.q,
+      acceptedAnswer: { "@type": "Answer", text: f.a },
+    })),
+  };
+
   return (
     <div className="bg-neu-bg">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(howToSchema) }} />
@@ -233,15 +172,14 @@ export default function LandingPage() {
           >
             <div className="inline-block rounded-2xl shadow-neu p-10 mb-8">
               <h1 className="text-4xl sm:text-5xl font-bold text-neu-text mb-4">
-                Set Up OpenClaw
+                {t("heroTitle")}
                 <br />
                 <span className="bg-gradient-to-r from-blue-600 to-brand-500 bg-clip-text text-transparent">
-                  Without the Pain
+                  {t("heroSubtitle")}
                 </span>
               </h1>
               <p className="text-lg text-neu-muted max-w-2xl mx-auto">
-                Interactive step-by-step guide with AI assistance on every step.
-                From zero to a fully running OpenClaw agent on Google Cloud or your local machine.
+                {t("heroDescription")}
               </p>
             </div>
           </motion.div>
@@ -255,13 +193,13 @@ export default function LandingPage() {
               href="/register"
               className="neu-btn-primary rounded-full px-8 py-3.5 text-lg"
             >
-              Start Setup Guide
+              {t("startGuide")}
             </Link>
             <Link
               href="#features"
               className="neu-btn rounded-full px-8 py-3.5 text-lg text-neu-muted hover:text-neu-text"
             >
-              See What You Get
+              {t("seeFeatures")}
             </Link>
           </motion.div>
         </div>
@@ -278,10 +216,10 @@ export default function LandingPage() {
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl font-bold text-center text-neu-text mb-4">
-            What You Get After Completing the Guide
+            {t("benefitsTitle")}
           </h2>
           <p className="text-neu-muted text-center mb-12 max-w-2xl mx-auto">
-            Every item below is a verified, working result you will have at the end.
+            {t("benefitsDescription")}
           </p>
           <div className="grid md:grid-cols-2 gap-4 max-w-4xl mx-auto">
             {benefits.map((b, i) => (
@@ -315,7 +253,7 @@ export default function LandingPage() {
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl font-bold text-center text-neu-text mb-12">
-            Step-by-Step Structure
+            {t("stepsTitle")}
           </h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto">
             {steps.map((s, i) => (
@@ -354,11 +292,10 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl mx-auto text-center">
             <h2 className="text-3xl font-bold text-neu-text mb-4">
-              AI Assistant on Every Step
+              {t("aiTitle")}
             </h2>
             <p className="text-neu-muted mb-8">
-              Stuck on an error? Paste the error text or upload a screenshot.
-              The AI knows exactly which step you are on and gives you specific fixes.
+              {t("aiDescription")}
             </p>
             <div className="rounded-2xl shadow-neu-inset bg-gray-900 p-6 text-left">
               <div className="flex gap-2 mb-4">
@@ -387,15 +324,12 @@ export default function LandingPage() {
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl font-bold text-center text-neu-text mb-4">
-            Trusted by Engineers
+            {t("testimonialsTitle")}
           </h2>
-          <p className="text-neu-muted text-center mb-12 max-w-2xl mx-auto">
-            Real feedback from people who completed the guide.
-          </p>
-          <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-            {testimonials.map((t, i) => (
+          <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto mt-12">
+            {testimonials.map((item, i) => (
               <motion.div
-                key={t.name}
+                key={item.name}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -404,15 +338,15 @@ export default function LandingPage() {
               >
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-brand-500 flex items-center justify-center text-white font-bold text-sm">
-                    {t.name.charAt(0)}
+                    {item.name.charAt(0)}
                   </div>
                   <div>
-                    <p className="font-semibold text-neu-text text-sm">{t.name}</p>
-                    <p className="text-neu-muted text-xs">{t.role}</p>
+                    <p className="font-semibold text-neu-text text-sm">{item.name}</p>
+                    <p className="text-neu-muted text-xs">{item.role}</p>
                   </div>
                 </div>
                 <p className="text-neu-muted text-sm leading-relaxed italic">
-                  &ldquo;{t.quote}&rdquo;
+                  &ldquo;{item.quote}&rdquo;
                 </p>
               </motion.div>
             ))}
@@ -431,7 +365,7 @@ export default function LandingPage() {
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl font-bold text-center text-neu-text mb-4">
-            Simple Pricing
+            {t("pricingTitle")}
           </h2>
           <PricingToggle />
         </div>
@@ -448,11 +382,11 @@ export default function LandingPage() {
       >
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl font-bold text-center text-neu-text mb-12">
-            Frequently Asked Questions
+            {t("faqTitle")}
           </h2>
           <div className="space-y-4">
             {faqs.map((faq) => (
-              <FAQItem key={faq.q} faq={faq} />
+              <FAQItem key={faq.q} q={faq.q} a={faq.a} />
             ))}
           </div>
         </div>
@@ -464,16 +398,16 @@ export default function LandingPage() {
           <div className="max-w-3xl mx-auto rounded-2xl shadow-neu p-12 text-center bg-neu-bg relative overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-brand-600/5 pointer-events-none" />
             <h2 className="text-3xl font-bold text-neu-text mb-4 relative">
-              Ready to Set Up OpenClaw?
+              {t("ctaTitle")}
             </h2>
             <p className="text-neu-muted mb-8 max-w-xl mx-auto relative">
-              Join the guide, follow the steps, and have your AI agent running in a few hours — not days.
+              {t("ctaDescription")}
             </p>
             <Link
               href="/register"
               className="relative inline-block neu-btn-primary rounded-full px-10 py-4 text-lg"
             >
-              Start Now
+              {t("startNow")}
             </Link>
           </div>
         </div>

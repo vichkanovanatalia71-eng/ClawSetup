@@ -4,8 +4,11 @@ import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { useTranslations } from "next-intl";
 
 export default function RegisterPage() {
+  const t = useTranslations("auth");
+  const tc = useTranslations("common");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -27,7 +30,7 @@ export default function RegisterPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error || "Registration failed");
+        setError(data.error || t("registrationFailed"));
         setLoading(false);
         return;
       }
@@ -43,7 +46,7 @@ export default function RegisterPage() {
         window.location.href = result.url;
       }
     } catch {
-      setError("Something went wrong. Please try again.");
+      setError(t("somethingWrong"));
       setLoading(false);
     }
   }
@@ -58,10 +61,10 @@ export default function RegisterPage() {
       >
         <div className="rounded-2xl shadow-neu p-8 bg-neu-bg">
           <h1 className="text-2xl font-bold text-neu-text text-center mb-2">
-            Create Your Account
+            {t("registerTitle")}
           </h1>
           <p className="text-neu-muted text-center mb-8 text-sm">
-            Get access to the full OpenClaw setup guide with AI assistance.
+            {t("registerDescription")}
           </p>
 
           {error && (
@@ -72,28 +75,28 @@ export default function RegisterPage() {
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label className="block text-sm font-medium text-neu-muted mb-2">Name</label>
+              <label className="block text-sm font-medium text-neu-muted mb-2">{t("name")}</label>
               <input
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 className="neu-input w-full"
-                placeholder="Your name"
+                placeholder={t("namePlaceholder")}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-neu-muted mb-2">Email</label>
+              <label className="block text-sm font-medium text-neu-muted mb-2">{t("email")}</label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 className="neu-input w-full"
-                placeholder="you@example.com"
+                placeholder={t("emailPlaceholder")}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-neu-muted mb-2">Password</label>
+              <label className="block text-sm font-medium text-neu-muted mb-2">{t("password")}</label>
               <input
                 type="password"
                 value={password}
@@ -101,7 +104,7 @@ export default function RegisterPage() {
                 required
                 minLength={8}
                 className="neu-input w-full"
-                placeholder="Min. 8 characters"
+                placeholder={t("minChars")}
               />
             </div>
             <motion.button
@@ -110,14 +113,14 @@ export default function RegisterPage() {
               whileTap={{ scale: 0.97 }}
               className="w-full neu-btn-primary rounded-full py-3 text-base disabled:opacity-50"
             >
-              {loading ? "Creating account..." : "Create Account"}
+              {loading ? t("creatingAccount") : tc("register")}
             </motion.button>
           </form>
 
           <p className="mt-6 text-center text-sm text-neu-muted">
-            Already have an account?{" "}
+            {t("haveAccount")}{" "}
             <Link href="/login" className="text-brand-600 hover:text-brand-700 font-medium">
-              Sign in
+              {tc("signIn")}
             </Link>
           </p>
         </div>

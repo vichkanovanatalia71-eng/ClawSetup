@@ -3,8 +3,11 @@
 import Link from "next/link";
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { useTranslations } from "next-intl";
 
 export default function ForgotPasswordPage() {
+  const t = useTranslations("auth");
+  const tc = useTranslations("common");
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -24,12 +27,12 @@ export default function ForgotPasswordPage() {
 
       if (!res.ok) {
         const data = await res.json();
-        setError(data.error || "Something went wrong");
+        setError(data.error || t("somethingWrong"));
       } else {
         setSent(true);
       }
     } catch {
-      setError("Network error. Please try again.");
+      setError(t("networkError"));
     }
 
     setLoading(false);
@@ -51,22 +54,21 @@ export default function ForgotPasswordPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 19v-8.93a2 2 0 01.89-1.664l7-4.666a2 2 0 012.22 0l7 4.666A2 2 0 0121 10.07V19M3 19a2 2 0 002 2h14a2 2 0 002-2M3 19l6.75-4.5M21 19l-6.75-4.5M3 10l6.75 4.5M21 10l-6.75 4.5m0 0l-1.14.76a2 2 0 01-2.22 0l-1.14-.76" />
                 </svg>
               </div>
-              <h1 className="text-2xl font-bold text-neu-text mb-2">Check Your Email</h1>
+              <h1 className="text-2xl font-bold text-neu-text mb-2">{t("checkEmail")}</h1>
               <p className="text-neu-muted text-sm mb-6">
-                If an account with that email exists, we&apos;ve sent a password reset link.
-                Please check your inbox and spam folder.
+                {t("checkEmailDescription")}
               </p>
               <Link href="/login" className="text-brand-600 hover:text-brand-700 text-sm font-medium">
-                Back to Sign In
+                {t("backToSignIn")}
               </Link>
             </div>
           ) : (
             <>
               <h1 className="text-2xl font-bold text-neu-text text-center mb-2">
-                Forgot Password
+                {t("forgotPasswordTitle")}
               </h1>
               <p className="text-neu-muted text-center mb-8 text-sm">
-                Enter your email and we&apos;ll send you a reset link.
+                {t("forgotPasswordDescription")}
               </p>
 
               {error && (
@@ -77,14 +79,14 @@ export default function ForgotPasswordPage() {
 
               <form onSubmit={handleSubmit} className="space-y-5">
                 <div>
-                  <label className="block text-sm font-medium text-neu-muted mb-2">Email</label>
+                  <label className="block text-sm font-medium text-neu-muted mb-2">{t("email")}</label>
                   <input
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
                     className="neu-input w-full"
-                    placeholder="you@example.com"
+                    placeholder={t("emailPlaceholder")}
                   />
                 </div>
                 <motion.button
@@ -93,14 +95,14 @@ export default function ForgotPasswordPage() {
                   whileTap={{ scale: 0.97 }}
                   className="w-full neu-btn-primary rounded-full py-3 text-base disabled:opacity-50"
                 >
-                  {loading ? "Sending..." : "Send Reset Link"}
+                  {loading ? t("sending") : t("sendResetLink")}
                 </motion.button>
               </form>
 
               <p className="mt-6 text-center text-sm text-neu-muted">
-                Remember your password?{" "}
+                {t("rememberPassword")}{" "}
                 <Link href="/login" className="text-brand-600 hover:text-brand-700 font-medium">
-                  Sign in
+                  {tc("signIn")}
                 </Link>
               </p>
             </>

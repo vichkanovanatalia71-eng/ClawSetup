@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeSanitize from "rehype-sanitize";
+import { useTranslations } from "next-intl";
 import FeedbackWidget from "./FeedbackWidget";
 import TroubleshootWizard from "./TroubleshootWizard";
 
@@ -38,6 +39,7 @@ export default function StepContent({
   completed,
   onToggleComplete,
 }: StepContentProps) {
+  const t = useTranslations("instruction");
   const readingTime = estimateReadingTime(
     [contentMd, goal, prerequisites, expectedResult, commonErrors].filter(Boolean).join(" ")
   );
@@ -63,17 +65,17 @@ export default function StepContent({
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
-              Completed
+              {t("completed")}
             </>
           ) : (
-            "Mark as Done"
+            t("markDone")
           )}
         </motion.button>
       </div>
 
       {goal && (
         <div className="rounded-2xl shadow-neu-sm p-5 mb-6 border-l-4 border-blue-400 bg-neu-bg">
-          <h3 className="font-semibold text-neu-text text-sm mb-1">Goal</h3>
+          <h3 className="font-semibold text-neu-text text-sm mb-1">{t("goal")}</h3>
           <p className="text-neu-muted text-sm">{goal}</p>
         </div>
       )}
@@ -101,7 +103,7 @@ export default function StepContent({
 
       {prerequisites && (
         <div className="rounded-2xl shadow-neu-sm p-5 mb-6 border-l-4 border-amber-400 bg-neu-bg">
-          <h3 className="font-semibold text-neu-text text-sm mb-1">Prerequisites</h3>
+          <h3 className="font-semibold text-neu-text text-sm mb-1">{t("prerequisites")}</h3>
           <p className="text-neu-muted text-sm">{prerequisites}</p>
         </div>
       )}
@@ -133,14 +135,14 @@ export default function StepContent({
 
       {expectedResult && (
         <div className="rounded-2xl shadow-neu-sm p-5 mb-6 border-l-4 border-green-400 bg-neu-bg">
-          <h3 className="font-semibold text-neu-text text-sm mb-1">Expected Result</h3>
+          <h3 className="font-semibold text-neu-text text-sm mb-1">{t("expectedResult")}</h3>
           <p className="text-neu-muted text-sm whitespace-pre-wrap">{expectedResult}</p>
         </div>
       )}
 
       {commonErrors && (
         <div className="rounded-2xl shadow-neu-sm p-5 mb-6 border-l-4 border-red-400 bg-neu-bg">
-          <h3 className="font-semibold text-neu-text text-sm mb-1">Common Errors</h3>
+          <h3 className="font-semibold text-neu-text text-sm mb-1">{t("commonErrors")}</h3>
           <div className="text-neu-muted text-sm whitespace-pre-wrap">{commonErrors}</div>
         </div>
       )}

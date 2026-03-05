@@ -5,10 +5,13 @@ import { useSession, signOut } from "next-auth/react";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import ThemeToggle from "@/components/ui/ThemeToggle";
+import LanguageSwitcher from "@/components/ui/LanguageSwitcher";
+import { useTranslations } from "next-intl";
 
 export default function Header() {
   const { data: session } = useSession();
   const [menuOpen, setMenuOpen] = useState(false);
+  const t = useTranslations("common");
 
   return (
     <header className="sticky top-0 z-50 pt-4 px-4">
@@ -34,13 +37,13 @@ export default function Header() {
                   href="/dashboard"
                   className="neu-nav-item"
                 >
-                  Dashboard
+                  {t("dashboard")}
                 </Link>
                 <Link
                   href="/profile"
                   className="neu-nav-item"
                 >
-                  Profile
+                  {t("profile")}
                 </Link>
                 {(session.user.role === "ADMIN" ||
                   session.user.role === "SUPERADMIN") && (
@@ -48,14 +51,14 @@ export default function Header() {
                     href="/admin"
                     className="neu-nav-item"
                   >
-                    Admin
+                    {t("admin")}
                   </Link>
                 )}
                 <button
                   onClick={() => signOut({ callbackUrl: "/" })}
                   className="neu-nav-item"
                 >
-                  Sign Out
+                  {t("signOut")}
                 </button>
               </>
             ) : (
@@ -64,25 +67,26 @@ export default function Header() {
                   href="/#pricing"
                   className="neu-nav-item"
                 >
-                  Pricing
+                  {t("pricing")}
                 </Link>
                 <Link
                   href="/login"
                   className="neu-nav-item"
                 >
-                  Sign In
+                  {t("signIn")}
                 </Link>
                 <Link
                   href="/register"
                   className="neu-btn-primary rounded-full px-6 py-2.5 text-sm"
                 >
-                  Get Started
+                  {t("getStarted")}
                 </Link>
               </>
             )}
           </div>
 
           <div className="flex items-center gap-2">
+            <LanguageSwitcher />
             <ThemeToggle />
 
           {/* Mobile menu button */}
@@ -120,18 +124,18 @@ export default function Header() {
               <div className="pb-4 space-y-2">
                 {session ? (
                   <>
-                    <Link href="/dashboard" className="block neu-nav-item">Dashboard</Link>
-                    <Link href="/profile" className="block neu-nav-item">Profile</Link>
+                    <Link href="/dashboard" className="block neu-nav-item">{t("dashboard")}</Link>
+                    <Link href="/profile" className="block neu-nav-item">{t("profile")}</Link>
                     {(session.user.role === "ADMIN" ||
                       session.user.role === "SUPERADMIN") && (
-                      <Link href="/admin" className="block neu-nav-item">Admin</Link>
+                      <Link href="/admin" className="block neu-nav-item">{t("admin")}</Link>
                     )}
-                    <button onClick={() => signOut({ callbackUrl: "/" })} className="block w-full text-left neu-nav-item">Sign Out</button>
+                    <button onClick={() => signOut({ callbackUrl: "/" })} className="block w-full text-left neu-nav-item">{t("signOut")}</button>
                   </>
                 ) : (
                   <>
-                    <Link href="/login" className="block neu-nav-item">Sign In</Link>
-                    <Link href="/register" className="block neu-btn-primary rounded-xl text-center py-3">Get Started</Link>
+                    <Link href="/login" className="block neu-nav-item">{t("signIn")}</Link>
+                    <Link href="/register" className="block neu-btn-primary rounded-xl text-center py-3">{t("getStarted")}</Link>
                   </>
                 )}
               </div>

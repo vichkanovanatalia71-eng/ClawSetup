@@ -3,10 +3,13 @@ import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 
 export const dynamic = "force-dynamic";
 
 export default async function CertificatesPage() {
+  const t = await getTranslations("certificates");
+  const tc = await getTranslations("common");
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) redirect("/login");
 
@@ -20,7 +23,7 @@ export default async function CertificatesPage() {
 
   return (
     <div className="max-w-3xl mx-auto py-10 px-4">
-      <h1 className="text-2xl font-bold text-neu-text mb-6">My Certificates</h1>
+      <h1 className="text-2xl font-bold text-neu-text mb-6">{t("title")}</h1>
 
       {certificates.length === 0 ? (
         <div className="rounded-2xl shadow-neu p-8 bg-neu-bg text-center">
@@ -30,13 +33,13 @@ export default async function CertificatesPage() {
             </svg>
           </div>
           <p className="text-neu-muted text-sm mb-4">
-            You haven&apos;t earned any certificates yet. Complete all steps in a scenario to get one!
+            {t("noCertificates")}
           </p>
           <Link
             href="/dashboard"
             className="neu-btn-primary rounded-full px-6 py-2.5 text-sm inline-block"
           >
-            Go to Dashboard
+            {tc("dashboard")}
           </Link>
         </div>
       ) : (
@@ -55,7 +58,7 @@ export default async function CertificatesPage() {
                 <div>
                   <p className="font-semibold text-neu-text">{cert.scenario.name}</p>
                   <p className="text-xs text-neu-muted">
-                    Completed on {new Date(cert.completedAt).toLocaleDateString()}
+                    {t("completedOn")} {new Date(cert.completedAt).toLocaleDateString()}
                   </p>
                 </div>
               </div>

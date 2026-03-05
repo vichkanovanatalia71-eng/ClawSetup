@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslations } from "next-intl";
 import StepNavigation from "@/components/instruction/StepNavigation";
 import StepContent from "@/components/instruction/StepContent";
 import AIAssistant from "@/components/instruction/AIAssistant";
@@ -64,6 +65,7 @@ export default function StepPageClient({
   completedSteps: initialCompleted,
 }: StepPageClientProps) {
   const router = useRouter();
+  const t = useTranslations("instruction");
   const [completed, setCompleted] = useState(step.completed);
   const [completedCount, setCompletedCount] = useState(initialCompleted);
   const [showAI, setShowAI] = useState(false);
@@ -285,7 +287,7 @@ export default function StepPageClient({
             className="xl:hidden fixed inset-0 z-50 bg-neu-bg"
           >
             <div className="flex justify-between items-center p-4 shadow-neu-sm mx-4 mt-4 rounded-2xl bg-neu-bg">
-              <h3 className="font-semibold text-neu-text">AI Assistant</h3>
+              <h3 className="font-semibold text-neu-text">{t("aiTitle")}</h3>
               <motion.button
                 whileTap={{ scale: 0.9 }}
                 onClick={() => setShowAI(false)}
