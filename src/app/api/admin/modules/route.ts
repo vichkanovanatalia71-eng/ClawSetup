@@ -17,9 +17,9 @@ export async function POST(req: NextRequest) {
 
   const { scenarioId, title, order } = await req.json();
 
-  const module = await prisma.module.create({
+  const newModule = await prisma.module.create({
     data: { scenarioId, title, order: order || 0 },
   });
 
-  return NextResponse.json({ module }, { status: 201 });
+  return NextResponse.json({ module: newModule }, { status: 201 });
 }

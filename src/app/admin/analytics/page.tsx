@@ -60,8 +60,6 @@ export default async function AnalyticsPage() {
   }]));
 
   const totalUsers = await prisma.user.count();
-  const maxCompletion = Math.max(...Object.values(completionMap), 1);
-
   // NPS summary
   const npsResponses = await prisma.nPSResponse.findMany({
     select: { score: true },

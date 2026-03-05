@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 
 export default function FeedbackWidget({ stepId }: { stepId: string }) {
-  const [feedback, setFeedback] = useState<boolean | null>(null);
+  const [_feedback, setFeedback] = useState<boolean | null>(null);
   const [submitted, setSubmitted] = useState(false);
 
   useEffect(() => {
