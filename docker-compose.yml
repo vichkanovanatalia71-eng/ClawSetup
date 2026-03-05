@@ -4,9 +4,9 @@ services:
   db:
     image: postgres:16-alpine
     environment:
-      POSTGRES_USER: clawsetup
-      POSTGRES_PASSWORD: clawsetup_dev
-      POSTGRES_DB: clawsetup
+      POSTGRES_USER: ${POSTGRES_USER:-clawsetup}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      POSTGRES_DB: ${POSTGRES_DB:-clawsetup}
     ports:
       - "5432:5432"
     volumes:
@@ -17,10 +17,10 @@ services:
     ports:
       - "3000:3000"
     environment:
-      DATABASE_URL: postgresql://clawsetup:clawsetup_dev@db:5432/clawsetup?schema=public
-      NEXTAUTH_URL: http://localhost:3000
-      NEXTAUTH_SECRET: dev-secret-change-in-production
-      NODE_ENV: development
+      DATABASE_URL: postgresql://${POSTGRES_USER:-clawsetup}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-clawsetup}?schema=public
+      NEXTAUTH_URL: ${NEXTAUTH_URL:-http://localhost:3000}
+      NEXTAUTH_SECRET: ${NEXTAUTH_SECRET:?Set NEXTAUTH_SECRET in .env}
+      NODE_ENV: ${NODE_ENV:-development}
     depends_on:
       - db
 

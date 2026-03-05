@@ -9,12 +9,24 @@ export interface ChurnScore {
 }
 
 export async function calculateChurnScore(userId: string): Promise<ChurnScore> {
+  const fourteenDaysAgo = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000);
+  const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+
+  // Single query to reduce N+1
   const user = await prisma.user.findUnique({
     where: { id: userId },
     select: {
       lastLoginAt: true,
       createdAt: true,
       subscription: { select: { status: true, updatedAt: true } },
+      progress: {
+        where: { completed: true },
+        select: { completedAt: true },
+      },
+      aiTickets: {
+        where: { createdAt: { gte: fourteenDaysAgo } },
+        select: { id: true },
+      },
     },
   });
 
@@ -23,15 +35,15 @@ export async function calculateChurnScore(userId: string): Promise<ChurnScore> {
   let score = 0;
   const factors: string[] = [];
 
-  // Factor 1: Days since last login (0-30 points)
+  // Factor 1: Days since last login (0-25 points)
   const daysSinceLogin = user.lastLoginAt
     ? Math.floor((Date.now() - new Date(user.lastLoginAt).getTime()) / (24 * 60 * 60 * 1000))
     : 999;
   if (daysSinceLogin > 30) {
-    score += 30;
+    score += 25;
     factors.push(`No login in ${daysSinceLogin} days`);
   } else if (daysSinceLogin > 14) {
-    score += 20;
+    score += 18;
     factors.push(`Last login ${daysSinceLogin} days ago`);
   } else if (daysSinceLogin > 7) {
     score += 10;
@@ -39,18 +51,11 @@ export async function calculateChurnScore(userId: string): Promise<ChurnScore> {
   }
 
   // Factor 2: Progress stall (0-25 points)
-  const recentProgress = await prisma.userProgress.count({
-    where: {
-      userId,
-      completed: true,
-      completedAt: { gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) },
-    },
-  });
+  const recentProgress = user.progress.filter(
+    (p) => p.completedAt && p.completedAt >= sevenDaysAgo
+  ).length;
   if (recentProgress === 0) {
-    const totalProgress = await prisma.userProgress.count({
-      where: { userId, completed: true },
-    });
-    if (totalProgress > 0) {
+    if (user.progress.length > 0) {
       score += 25;
       factors.push("No progress in 7+ days");
     } else {
@@ -59,16 +64,13 @@ export async function calculateChurnScore(userId: string): Promise<ChurnScore> {
     }
   }
 
-  // Factor 3: Declining AI usage (0-20 points)
-  const recentAI = await prisma.aITicket.count({
-    where: {
-      userId,
-      createdAt: { gte: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000) },
-    },
-  });
-  if (recentAI === 0) {
-    score += 10;
+  // Factor 3: Declining AI usage (0-25 points)
+  if (user.aiTickets.length === 0) {
+    score += 25;
     factors.push("No AI usage in 14 days");
+  } else if (user.aiTickets.length < 3) {
+    score += 10;
+    factors.push(`Only ${user.aiTickets.length} AI usage in 14 days`);
   }
 
   // Factor 4: NPS score (0-25 points)

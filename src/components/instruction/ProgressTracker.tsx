@@ -16,7 +16,7 @@ export default function ProgressTracker({ totalSteps, completedSteps }: Progress
           {completedSteps}/{totalSteps} steps — {percentage}%
         </span>
       </div>
-      <div className="neu-progress-track">
+      <div className="neu-progress-track" role="progressbar" aria-valuenow={percentage} aria-valuemin={0} aria-valuemax={100} aria-label={`${percentage}% complete`}>
         <div
           className="neu-progress-fill"
           style={{ width: `${percentage}%` }}

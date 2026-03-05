@@ -88,7 +88,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (imageBase64 && imageBase64.length > MAX_IMAGE_SIZE * 1.37) {
+    if (imageBase64 && Math.ceil(imageBase64.length * 3 / 4) > MAX_IMAGE_SIZE) {
       return NextResponse.json(
         { error: "Image too large. Max 4MB." },
         { status: 400 }

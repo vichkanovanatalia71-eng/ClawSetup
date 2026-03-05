@@ -26,6 +26,8 @@ export default withAuth(
           pathname.startsWith("/api/auth") ||
           pathname.startsWith("/api/register") ||
           pathname.startsWith("/api/stripe/webhook") ||
+          pathname.startsWith("/api/cron") ||
+          pathname.startsWith("/api/health") ||
           pathname === "/login" ||
           pathname === "/register" ||
           pathname === "/terms" ||

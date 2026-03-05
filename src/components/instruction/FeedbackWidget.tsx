@@ -8,15 +8,17 @@ export default function FeedbackWidget({ stepId }: { stepId: string }) {
   const [submitted, setSubmitted] = useState(false);
 
   useEffect(() => {
+    let cancelled = false;
     fetch(`/api/feedback?stepId=${stepId}`)
       .then((r) => r.json())
       .then((data) => {
-        if (data.helpful !== null) {
+        if (!cancelled && data.helpful !== null) {
           setFeedback(data.helpful);
           setSubmitted(true);
         }
       })
       .catch(() => {});
+    return () => { cancelled = true; };
   }, [stepId]);
 
   async function submit(helpful: boolean) {

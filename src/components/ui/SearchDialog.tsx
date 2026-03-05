@@ -150,6 +150,11 @@ export default function SearchDialog() {
                 onChange={(e) => setQuery(e.target.value)}
                 onKeyDown={handleKeyDown}
                 placeholder="Search steps..."
+                aria-label="Search steps"
+                role="combobox"
+                aria-expanded={results.length > 0}
+                aria-controls="search-results"
+                aria-activedescendant={results[selectedIndex] ? `search-result-${results[selectedIndex].id}` : undefined}
                 className="neu-input w-full text-base"
               />
             </div>
@@ -176,10 +181,13 @@ export default function SearchDialog() {
               <div className="px-4 pb-3 text-sm text-neu-muted">Searching...</div>
             )}
             {results.length > 0 && (
-              <div className="max-h-80 overflow-y-auto px-4 pb-4 space-y-1">
+              <div id="search-results" role="listbox" className="max-h-80 overflow-y-auto px-4 pb-4 space-y-1">
                 {results.map((r, i) => (
                   <button
                     key={r.id}
+                    id={`search-result-${r.id}`}
+                    role="option"
+                    aria-selected={i === selectedIndex}
                     onClick={() => navigateTo(r.url)}
                     className={`w-full text-left px-4 py-3 rounded-xl transition-all duration-200 ${
                       i === selectedIndex ? "shadow-neu-flat bg-white/40" : "hover:shadow-neu-flat"
@@ -201,7 +209,7 @@ export default function SearchDialog() {
               </div>
             )}
             {query.length >= 2 && !loading && results.length === 0 && (
-              <div className="px-4 pb-4 text-sm text-neu-muted text-center">No results found</div>
+              <div aria-live="polite" className="px-4 pb-4 text-sm text-neu-muted text-center">No results found</div>
             )}
             <div className="px-4 py-2 border-t border-neu-dark/10 text-xs text-neu-muted flex justify-between">
               <span>Use arrows to navigate</span>

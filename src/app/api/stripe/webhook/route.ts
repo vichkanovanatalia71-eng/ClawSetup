@@ -34,6 +34,10 @@ export async function POST(req: NextRequest) {
         const userId = session.metadata?.userId;
         if (!userId) break;
 
+        // Validate user exists
+        const existingUser = await prisma.user.findUnique({ where: { id: userId } });
+        if (!existingUser) break;
+
         const subscription = await stripe.subscriptions.retrieve(
           session.subscription as string
         );
@@ -65,38 +69,45 @@ export async function POST(req: NextRequest) {
         });
 
         if (!isTrial && session.payment_intent) {
-          await prisma.payment.create({
-            data: {
-              subscriptionId: (
-                await prisma.subscription.findUnique({ where: { userId } })
-              )!.id,
-              stripePaymentId: session.payment_intent as string,
-              amount: session.amount_total || 0,
-              currency: session.currency || "usd",
-              status: "succeeded",
-              invoiceUrl: null,
-            },
-          });
+          const dbSub = await prisma.subscription.findUnique({ where: { userId } });
+          if (dbSub) {
+            await prisma.payment.create({
+              data: {
+                subscriptionId: dbSub.id,
+                stripePaymentId: session.payment_intent as string,
+                amount: session.amount_total || 0,
+                currency: session.currency || "usd",
+                status: "succeeded",
+                invoiceUrl: null,
+              },
+            });
+          }
         }
 
         // Send activation email
-        const user = await prisma.user.findUnique({ where: { id: userId } });
-        if (user?.email) {
+        if (existingUser.email) {
           const tmpl = subscriptionActivatedEmail();
-          sendEmail({ to: user.email, ...tmpl });
+          try {
+            await sendEmail({ to: existingUser.email, ...tmpl });
+          } catch (err) {
+            logger.error("Failed to send activation email", { userId, error: String(err) });
+          }
         }
         break;
       }
 
       case "customer.subscription.updated": {
         const sub = event.data.object as Stripe.Subscription;
+        const newStatus = sub.status === "active" ? "ACTIVE" : sub.status === "past_due" ? "PAST_DUE" : "CANCELED";
         await prisma.subscription.updateMany({
           where: { stripeSubscriptionId: sub.id },
           data: {
-            status: sub.status === "active" ? "ACTIVE" : sub.status === "past_due" ? "PAST_DUE" : "CANCELED",
+            status: newStatus,
             currentPeriodStart: new Date(sub.current_period_start * 1000),
             currentPeriodEnd: new Date(sub.current_period_end * 1000),
             cancelAtPeriodEnd: sub.cancel_at_period_end,
+            // Reset dunning counter when subscription becomes active again
+            ...(newStatus === "ACTIVE" && { dunningEmailsSent: 0 }),
           },
         });
         break;
@@ -114,7 +125,11 @@ export async function POST(req: NextRequest) {
         });
         if (canceledDbSub?.user?.email) {
           const tmpl = subscriptionCanceledEmail();
-          sendEmail({ to: canceledDbSub.user.email, ...tmpl });
+          try {
+            await sendEmail({ to: canceledDbSub.user.email, ...tmpl });
+          } catch (err) {
+            logger.error("Failed to send cancellation email", { error: String(err) });
+          }
         }
         break;
       }
@@ -133,7 +148,11 @@ export async function POST(req: NextRequest) {
             });
             if (failedSub.user?.email) {
               const tmpl = paymentFailedEmail();
-              sendEmail({ to: failedSub.user.email, ...tmpl });
+              try {
+                await sendEmail({ to: failedSub.user.email, ...tmpl });
+              } catch (err) {
+                logger.error("Failed to send payment failed email", { error: String(err) });
+              }
             }
           }
         }

@@ -42,6 +42,7 @@ export default function StepNavigation({ scenarioSlug, modules }: StepNavigation
                   <li key={step.id}>
                     <Link
                       href={`/instruction/${scenarioSlug}/${step.slug}`}
+                      aria-current={isActive ? "page" : undefined}
                       className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm transition-all duration-200 ${
                         isActive
                           ? "shadow-neu-inset-sm text-brand-600 font-medium"

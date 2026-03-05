@@ -8,21 +8,24 @@ export async function updateStreak(userId: string): Promise<{ currentStreak: num
 
   if (!user) return { currentStreak: 0, longestStreak: 0 };
 
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
+  // Use ISO date strings to avoid DST issues
+  const todayStr = new Date().toISOString().slice(0, 10);
   const lastActive = user.lastActiveDate ? new Date(user.lastActiveDate) : null;
-  if (lastActive) lastActive.setHours(0, 0, 0, 0);
+  const lastStr = lastActive?.toISOString().slice(0, 10) ?? null;
+
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  const yesterdayStr = yesterday.toISOString().slice(0, 10);
 
   let newStreak = user.currentStreak;
 
-  if (!lastActive) {
+  if (!lastStr) {
     // First activity ever
     newStreak = 1;
-  } else if (lastActive.getTime() === today.getTime()) {
+  } else if (lastStr === todayStr) {
     // Already active today — no change
     return { currentStreak: user.currentStreak, longestStreak: user.longestStreak };
-  } else if (today.getTime() - lastActive.getTime() === 24 * 60 * 60 * 1000) {
+  } else if (lastStr === yesterdayStr) {
     // Active yesterday — increment streak
     newStreak = user.currentStreak + 1;
   } else {
@@ -37,7 +40,7 @@ export async function updateStreak(userId: string): Promise<{ currentStreak: num
     data: {
       currentStreak: newStreak,
       longestStreak: newLongest,
-      lastActiveDate: today,
+      lastActiveDate: new Date(),
     },
   });
 

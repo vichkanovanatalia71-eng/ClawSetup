@@ -23,9 +23,26 @@ export async function PUT(req: NextRequest) {
 
   const { userId, role } = parsed.data;
 
-  // Only SUPERADMIN can assign SUPERADMIN role
-  if (role === "SUPERADMIN" && session.user.role !== "SUPERADMIN") {
-    return NextResponse.json({ error: "Only SUPERADMIN can grant SUPERADMIN role" }, { status: 403 });
+  // Prevent changing own role
+  if (userId === session.user.id) {
+    return NextResponse.json({ error: "Cannot change own role" }, { status: 400 });
+  }
+
+  // Verify target user exists and check their current role
+  const targetUser = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { role: true },
+  });
+  if (!targetUser) {
+    return NextResponse.json({ error: "User not found" }, { status: 404 });
+  }
+
+  // Only SUPERADMIN can modify SUPERADMIN users or assign SUPERADMIN role
+  if (
+    (targetUser.role === "SUPERADMIN" || role === "SUPERADMIN") &&
+    session.user.role !== "SUPERADMIN"
+  ) {
+    return NextResponse.json({ error: "Only SUPERADMIN can modify SUPERADMIN users" }, { status: 403 });
   }
 
   const updated = await prisma.user.update({

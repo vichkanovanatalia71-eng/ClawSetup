@@ -4,6 +4,7 @@ import { z } from "zod";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { sendEmail } from "@/lib/email";
+import { escapeHtml } from "@/lib/utils";
 
 const supportSchema = z.object({
   stepId: z.string().optional(),
@@ -41,7 +42,7 @@ export async function POST(req: NextRequest) {
       await sendEmail({
         to: adminEmail,
         subject: `New Support Ticket: ${parsed.data.subject}`,
-        html: `<p>New support ticket from ${session.user.email}</p><p>${parsed.data.message}</p><p>Ticket ID: ${ticket.id}</p>`,
+        html: `<p>New support ticket from ${escapeHtml(session.user.email || "")}</p><p>${escapeHtml(parsed.data.message)}</p><p>Ticket ID: ${escapeHtml(ticket.id)}</p>`,
       });
     }
 

@@ -7,6 +7,17 @@ interface LogEntry {
   timestamp: string;
 }
 
+function safeStringify(obj: unknown): string {
+  const seen = new WeakSet();
+  return JSON.stringify(obj, (_, value) => {
+    if (typeof value === "object" && value !== null) {
+      if (seen.has(value)) return "[Circular]";
+      seen.add(value);
+    }
+    return value;
+  });
+}
+
 function log(level: LogLevel, message: string, data?: Record<string, unknown>) {
   const entry: LogEntry = {
     level,
@@ -18,7 +29,7 @@ function log(level: LogLevel, message: string, data?: Record<string, unknown>) {
   if (process.env.NODE_ENV === "production") {
     // JSON structured logging for production
     console[level === "error" ? "error" : level === "warn" ? "warn" : "log"](
-      JSON.stringify(entry)
+      safeStringify(entry)
     );
   } else {
     // Human-readable for development

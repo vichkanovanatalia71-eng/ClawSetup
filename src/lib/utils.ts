@@ -18,6 +18,14 @@ export function formatDate(date: Date | string): string {
   });
 }
 
+export function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
 export function formatCurrency(amount: number, currency = "usd"): string {
   return new Intl.NumberFormat("en-US", {
     style: "currency",

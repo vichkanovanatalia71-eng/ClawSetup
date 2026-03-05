@@ -60,7 +60,11 @@ export async function POST(req: NextRequest) {
 
     // Send welcome email
     const welcome = welcomeEmail(user.name || undefined);
-    sendEmail({ to: user.email, ...welcome });
+    try {
+      await sendEmail({ to: user.email, ...welcome });
+    } catch {
+      // Non-critical: log but don't fail registration
+    }
 
     // Send email verification
     const verifyToken = crypto.randomBytes(32).toString("hex");
@@ -72,7 +76,11 @@ export async function POST(req: NextRequest) {
       },
     });
     const verifyEmail = emailVerificationEmail(verifyToken);
-    sendEmail({ to: user.email, ...verifyEmail });
+    try {
+      await sendEmail({ to: user.email, ...verifyEmail });
+    } catch {
+      // Non-critical: log but don't fail registration
+    }
 
     return NextResponse.json(
       { id: user.id, email: user.email },

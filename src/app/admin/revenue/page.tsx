@@ -27,24 +27,28 @@ export default async function RevenuePage() {
     },
   });
 
-  // Monthly revenue from payments
+  // Monthly revenue from payments (parallel queries)
   const now = new Date();
-  const months: { label: string; revenue: number }[] = [];
-  for (let i = 5; i >= 0; i--) {
+  const monthRanges = Array.from({ length: 6 }, (_, idx) => {
+    const i = 5 - idx;
     const start = new Date(now.getFullYear(), now.getMonth() - i, 1);
     const end = new Date(now.getFullYear(), now.getMonth() - i + 1, 1);
-    const payments = await prisma.payment.aggregate({
-      where: {
-        status: "succeeded",
-        createdAt: { gte: start, lt: end },
-      },
-      _sum: { amount: true },
-    });
-    months.push({
-      label: start.toLocaleDateString("en", { month: "short", year: "2-digit" }),
-      revenue: Math.round((payments._sum.amount || 0) / 100),
-    });
-  }
+    return { start, end };
+  });
+
+  const monthlyPayments = await Promise.all(
+    monthRanges.map(({ start, end }) =>
+      prisma.payment.aggregate({
+        where: { status: "succeeded", createdAt: { gte: start, lt: end } },
+        _sum: { amount: true },
+      })
+    )
+  );
+
+  const months = monthRanges.map(({ start }, i) => ({
+    label: start.toLocaleDateString("en", { month: "short", year: "2-digit" }),
+    revenue: Math.round((monthlyPayments[i]._sum.amount || 0) / 100),
+  }));
 
   const maxRevenue = Math.max(...months.map((m) => m.revenue), 1);
 

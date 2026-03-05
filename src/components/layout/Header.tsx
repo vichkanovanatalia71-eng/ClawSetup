@@ -12,6 +12,9 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-50 pt-4 px-4">
+      <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:z-[60] focus:top-2 focus:left-2 focus:px-4 focus:py-2 focus:bg-brand-600 focus:text-white focus:rounded-lg focus:text-sm focus:font-medium">
+        Skip to content
+      </a>
       <nav className="max-w-7xl mx-auto bg-[#e0e5ec] rounded-2xl shadow-neu-sm px-6">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
@@ -86,9 +89,12 @@ export default function Header() {
           <div className="md:hidden flex items-center">
             <button
               onClick={() => setMenuOpen(!menuOpen)}
+              aria-label={menuOpen ? "Close menu" : "Open menu"}
+              aria-expanded={menuOpen}
+              aria-controls="mobile-nav"
               className="neu-btn w-10 h-10 !p-0 rounded-xl flex items-center justify-center"
             >
-              <svg className="h-5 w-5 text-neu-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="h-5 w-5 text-neu-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                 {menuOpen ? (
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 ) : (
@@ -108,6 +114,7 @@ export default function Header() {
               animate={{ height: "auto", opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
               transition={{ duration: 0.2 }}
+              id="mobile-nav"
               className="md:hidden overflow-hidden"
             >
               <div className="pb-4 space-y-2">

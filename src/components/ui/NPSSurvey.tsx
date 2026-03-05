@@ -64,8 +64,8 @@ export default function NPSSurvey() {
           <>
             <div className="flex justify-between items-start mb-3">
               <p className="text-sm font-semibold text-neu-text">How likely are you to recommend ClawSetup?</p>
-              <button onClick={dismiss} className="text-neu-muted text-xs hover:text-neu-text ml-2">
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <button onClick={dismiss} aria-label="Dismiss survey" className="text-neu-muted text-xs hover:text-neu-text ml-2">
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
@@ -75,6 +75,8 @@ export default function NPSSurvey() {
                 <button
                   key={n}
                   onClick={() => setScore(n)}
+                  aria-label={`Score ${n} out of 10`}
+                  aria-pressed={score === n}
                   className={`w-7 h-7 rounded-lg text-xs font-medium transition-all ${
                     score === n
                       ? "bg-brand-500 text-white shadow-sm"

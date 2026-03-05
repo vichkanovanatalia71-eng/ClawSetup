@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { sendEmail } from "@/lib/email";
+import { escapeHtml } from "@/lib/utils";
 
 export async function generateWeeklyDigests(): Promise<number> {
   const oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
@@ -40,7 +41,7 @@ export async function generateWeeklyDigests(): Promise<number> {
           <div style="background: #ffffff; border-radius: 16px; padding: 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
             <h1 style="font-size: 24px; margin-bottom: 16px;">Your Weekly Progress</h1>
             <p style="font-size: 14px; line-height: 1.6; color: #636e72;">
-              Hi ${user.name || "there"},
+              Hi ${escapeHtml(user.name || "there")},
             </p>
             <p style="font-size: 14px; line-height: 1.6; color: #636e72;">
               This week you completed <strong>${stepsThisWeek}</strong> step${stepsThisWeek !== 1 ? "s" : ""}.

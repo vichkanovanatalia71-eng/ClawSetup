@@ -3,7 +3,12 @@ import { prisma } from "@/lib/prisma";
 export const dynamic = "force-dynamic";
 
 export default async function CohortsPage() {
+  // Limit to last 12 months of registrations to prevent OOM
+  const twelveMonthsAgo = new Date();
+  twelveMonthsAgo.setMonth(twelveMonthsAgo.getMonth() - 12);
+
   const users = await prisma.user.findMany({
+    where: { createdAt: { gte: twelveMonthsAgo } },
     select: {
       id: true,
       createdAt: true,

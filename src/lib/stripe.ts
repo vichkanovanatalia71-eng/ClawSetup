@@ -1,13 +1,18 @@
 import Stripe from "stripe";
 
-function getStripeClient() {
-  const key = process.env.STRIPE_SECRET_KEY;
-  if (!key) {
-    throw new Error("STRIPE_SECRET_KEY is not set");
+let cachedClient: Stripe | null = null;
+
+function getStripeClient(): Stripe {
+  if (!cachedClient) {
+    const key = process.env.STRIPE_SECRET_KEY;
+    if (!key) {
+      throw new Error("STRIPE_SECRET_KEY is not set");
+    }
+    cachedClient = new Stripe(key, {
+      apiVersion: "2025-02-24.acacia",
+    });
   }
-  return new Stripe(key, {
-    apiVersion: "2025-02-24.acacia",
-  });
+  return cachedClient;
 }
 
 export const stripe = new Proxy({} as Stripe, {

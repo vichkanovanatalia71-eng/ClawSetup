@@ -4,6 +4,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import rehypeSanitize from "rehype-sanitize";
 import FeedbackWidget from "./FeedbackWidget";
 import TroubleshootWizard from "./TroubleshootWizard";
 
@@ -108,6 +109,7 @@ export default function StepContent({
       <div className="prose prose-sm max-w-none mb-8">
         <ReactMarkdown
           remarkPlugins={[remarkGfm]}
+          rehypePlugins={[rehypeSanitize]}
           components={{
             pre({ children }) {
               return <CodeBlock>{children}</CodeBlock>;

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const tourSteps = [
@@ -43,6 +43,11 @@ export default function OnboardingTour() {
     }
   }, []);
 
+  const complete = useCallback(() => {
+    localStorage.setItem("onboarding_completed", "true");
+    setShow(false);
+  }, []);
+
   function next() {
     if (currentStep < tourSteps.length - 1) {
       setCurrentStep(currentStep + 1);
@@ -51,10 +56,15 @@ export default function OnboardingTour() {
     }
   }
 
-  function complete() {
-    localStorage.setItem("onboarding_completed", "true");
-    setShow(false);
-  }
+  useEffect(() => {
+    if (!show) return;
+    function handleKey(e: KeyboardEvent) {
+      if (e.key === "Escape") complete();
+      if (e.key === "ArrowRight") next();
+    }
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  });
 
   if (!show) return null;
 
@@ -71,6 +81,9 @@ export default function OnboardingTour() {
       >
         <motion.div
           key={currentStep}
+          role="dialog"
+          aria-modal="true"
+          aria-label={`Onboarding step ${currentStep + 1} of ${tourSteps.length}: ${step.title}`}
           initial={{ opacity: 0, scale: 0.9, y: 10 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.9 }}

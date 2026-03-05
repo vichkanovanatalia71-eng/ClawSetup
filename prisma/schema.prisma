@@ -118,6 +118,7 @@ model Subscription {
 
   @@index([status])
   @@index([stripeCustomerId])
+  @@index([updatedAt])
 }
 
 model Payment {
@@ -237,6 +238,7 @@ model UserProgress {
   @@unique([userId, stepId])
   @@index([userId])
   @@index([stepId])
+  @@index([userId, completed])
 }
 
 model AITicket {
@@ -258,6 +260,7 @@ model AITicket {
   @@index([userId])
   @@index([stepId])
   @@index([createdAt])
+  @@index([userId, createdAt])
 }
 
 model Conversation {

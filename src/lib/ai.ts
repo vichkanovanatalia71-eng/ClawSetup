@@ -45,6 +45,14 @@ FOLLOW-UP SUGGESTIONS:
 - Make suggestions specific to the current step and the user's situation.
 - Keep each suggestion under 50 characters.`;
 
+function sanitizeUserInput(text: string): string {
+  const forbidden = /ignore\s+(all\s+)?previous\s+instructions|system\s+prompt|you\s+are\s+now/gi;
+  if (forbidden.test(text)) {
+    return "[User message was filtered for safety. Please rephrase your question about this step.]";
+  }
+  return text.slice(0, 4000);
+}
+
 function buildQuickActionPrompt(action: string): string {
   switch (action) {
     case "explain_simpler":
@@ -110,7 +118,7 @@ export async function getAIResponse(params: AIRequestParams): Promise<string> {
     });
   }
 
-  content.push({ type: "text", text: finalMessage });
+  content.push({ type: "text", text: sanitizeUserInput(finalMessage) });
 
   const messages: Anthropic.Messages.MessageParam[] = [];
   if (conversationHistory && conversationHistory.length > 0) {
@@ -158,7 +166,7 @@ export async function getAIResponseStream(params: AIRequestParams): Promise<Read
     });
   }
 
-  content.push({ type: "text", text: finalMessage });
+  content.push({ type: "text", text: sanitizeUserInput(finalMessage) });
 
   const messages: Anthropic.Messages.MessageParam[] = [];
   if (conversationHistory && conversationHistory.length > 0) {

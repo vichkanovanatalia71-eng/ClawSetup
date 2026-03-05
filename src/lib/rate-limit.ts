@@ -43,9 +43,13 @@ export function rateLimit(
 }
 
 export function getClientIp(request: Request): string {
+  // Prefer x-real-ip (set by reverse proxy) over x-forwarded-for (can be spoofed)
+  const realIp = request.headers.get("x-real-ip");
+  if (realIp) return realIp;
+
   const forwarded = request.headers.get("x-forwarded-for");
   if (forwarded) {
     return forwarded.split(",")[0].trim();
   }
-  return request.headers.get("x-real-ip") || "unknown";
+  return "unknown";
 }

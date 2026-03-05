@@ -4,6 +4,7 @@ import { useState, useRef, useEffect, useMemo } from "react";
 import { motion } from "framer-motion";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import rehypeSanitize from "rehype-sanitize";
 
 function formatCitations(text: string): string {
   return text.replace(
@@ -261,7 +262,7 @@ export default function AIAssistant({ stepId }: AIAssistantProps) {
       </div>
 
       {/* Quick actions */}
-      <div className="p-3 border-b border-neu-dark/10 flex flex-wrap gap-1.5">
+      <div role="toolbar" aria-label="Quick actions" className="p-3 border-b border-neu-dark/10 flex flex-wrap gap-1.5">
         {quickActions.map((action) => (
           <motion.button
             key={action.id}
@@ -301,7 +302,7 @@ export default function AIAssistant({ stepId }: AIAssistantProps) {
             >
               {msg.role === "assistant" ? (
                 <div className="prose prose-sm max-w-none">
-                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                  <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeSanitize]}>
                     {formatCitations(msg.content)}
                   </ReactMarkdown>
                 </div>
@@ -362,8 +363,8 @@ export default function AIAssistant({ stepId }: AIAssistantProps) {
         )}
 
         {loading && !streamingContent && (
-          <div className="flex items-center gap-2 text-neu-muted text-sm">
-            <div className="animate-spin w-4 h-4 border-2 border-neu-dark border-t-brand-500 rounded-full" />
+          <div role="status" aria-live="polite" className="flex items-center gap-2 text-neu-muted text-sm">
+            <div className="animate-spin w-4 h-4 border-2 border-neu-dark border-t-brand-500 rounded-full" aria-hidden="true" />
             Analyzing...
           </div>
         )}
