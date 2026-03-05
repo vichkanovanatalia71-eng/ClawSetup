@@ -15,6 +15,7 @@ interface StepData {
   commonErrors: string;
   status: string;
   tags: string[];
+  videoUrl: string;
 }
 
 export default function StepEditor({ step }: { step: StepData }) {
@@ -131,6 +132,19 @@ export default function StepEditor({ step }: { step: StepData }) {
           onChange={(e) => update("commonErrors", e.target.value)}
           rows={5}
           className="neu-input w-full"
+        />
+      </div>
+
+      {/* Video URL */}
+      <div>
+        <label className="block text-sm font-medium text-neu-muted mb-2">
+          Video URL (YouTube, Loom, or direct)
+        </label>
+        <input
+          value={form.videoUrl}
+          onChange={(e) => update("videoUrl", e.target.value)}
+          className="neu-input w-full"
+          placeholder="https://youtube.com/watch?v=... or https://loom.com/share/..."
         />
       </div>
 

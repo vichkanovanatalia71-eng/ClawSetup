@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import FeedbackWidget from "./FeedbackWidget";
+import TroubleshootWizard from "./TroubleshootWizard";
 
 interface StepContentProps {
   stepId: string;
@@ -14,6 +15,7 @@ interface StepContentProps {
   contentMd: string;
   expectedResult: string | null;
   commonErrors: string | null;
+  videoUrl: string | null;
   completed: boolean;
   onToggleComplete: () => void;
 }
@@ -26,6 +28,7 @@ export default function StepContent({
   contentMd,
   expectedResult,
   commonErrors,
+  videoUrl,
   completed,
   onToggleComplete,
 }: StepContentProps) {
@@ -59,6 +62,27 @@ export default function StepContent({
         <div className="rounded-2xl shadow-neu-sm p-5 mb-6 border-l-4 border-blue-400 bg-neu-bg">
           <h3 className="font-semibold text-neu-text text-sm mb-1">Goal</h3>
           <p className="text-neu-muted text-sm">{goal}</p>
+        </div>
+      )}
+
+      {videoUrl && (
+        <div className="rounded-2xl shadow-neu-sm overflow-hidden mb-6 bg-neu-bg">
+          {videoUrl.includes("youtube.com") || videoUrl.includes("youtu.be") ? (
+            <iframe
+              src={videoUrl.replace("watch?v=", "embed/").replace("youtu.be/", "youtube.com/embed/")}
+              className="w-full aspect-video"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            />
+          ) : videoUrl.includes("loom.com") ? (
+            <iframe
+              src={videoUrl.replace("/share/", "/embed/")}
+              className="w-full aspect-video"
+              allowFullScreen
+            />
+          ) : (
+            <video src={videoUrl} controls className="w-full aspect-video" />
+          )}
         </div>
       )}
 
@@ -106,6 +130,8 @@ export default function StepContent({
           <div className="text-neu-muted text-sm whitespace-pre-wrap">{commonErrors}</div>
         </div>
       )}
+
+      <TroubleshootWizard stepId={stepId} />
 
       <FeedbackWidget stepId={stepId} />
 

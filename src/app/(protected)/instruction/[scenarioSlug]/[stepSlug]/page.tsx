@@ -42,6 +42,11 @@ export default async function StepPage({
               expectedResult: true,
               commonErrors: true,
               order: true,
+              media: {
+                where: { type: "video" },
+                select: { url: true, alt: true },
+                take: 1,
+              },
             },
           },
         },
@@ -56,7 +61,7 @@ export default async function StepPage({
   for (const mod of scenario.modules) {
     const found = mod.steps.find((s) => s.slug === params.stepSlug);
     if (found) {
-      currentStep = { ...found, moduleTitle: mod.title };
+      currentStep = { ...found, moduleId: mod.id, moduleTitle: mod.title };
       break;
     }
   }
@@ -98,6 +103,7 @@ export default async function StepPage({
       scenarioSlug={params.scenarioSlug}
       step={{
         id: currentStep.id,
+        moduleId: currentStep.moduleId,
         title: currentStep.title,
         goal: currentStep.goal,
         prerequisites: currentStep.prerequisites,
@@ -105,6 +111,7 @@ export default async function StepPage({
         expectedResult: currentStep.expectedResult,
         commonErrors: currentStep.commonErrors,
         completed: progressMap[currentStep.id] || false,
+        videoUrl: currentStep.media?.[0]?.url || null,
       }}
       navModules={navModules}
       totalSteps={totalSteps}

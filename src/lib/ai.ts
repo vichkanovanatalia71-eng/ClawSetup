@@ -30,7 +30,14 @@ RULES:
 5. Format responses with clear steps, code blocks, and expected outcomes.
 6. If you see a screenshot, analyze it carefully for error messages, incorrect configurations, or missing elements.
 7. Always consider the user's scenario context (local vs remote, OS, etc.).
-8. Respond in the same language the user writes in. If the instruction is in Ukrainian, respond in Ukrainian.`;
+8. Respond in the same language the user writes in. If the instruction is in Ukrainian, respond in Ukrainian.
+
+SOURCE CITATIONS:
+- When your answer is based on specific sections of the step content, cite the source using the format: [Source: Section Name]
+- Valid section names: "Goal", "Prerequisites", "Step Content", "Expected Result", "Common Errors"
+- Place citations at the end of the relevant paragraph
+- If the user's question is NOT covered by the step content, clearly state: "This is not covered in the current step." Then offer your best general advice, prefixed with "[General advice]".
+- Always prefer citing the step content over giving general advice.`;
 
 function buildQuickActionPrompt(action: string): string {
   switch (action) {

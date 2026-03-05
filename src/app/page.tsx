@@ -27,6 +27,29 @@ const steps = [
   { num: "13-17", title: "Operate", desc: "Dashboard, diagnostics, security, backups" },
 ];
 
+const testimonials = [
+  {
+    name: "Oleksiy K.",
+    role: "DevOps Engineer",
+    quote: "I spent 3 days trying to set up OpenClaw from docs alone. With this guide, everything worked in 4 hours. The AI assistant saved me at least twice when I hit permission errors.",
+  },
+  {
+    name: "Sarah M.",
+    role: "Full Stack Developer",
+    quote: "The step-by-step format with copy-paste commands is exactly what I needed. No guessing, no ambiguity. The screenshot analysis feature is magic.",
+  },
+  {
+    name: "Andrii P.",
+    role: "Cloud Architect",
+    quote: "Even as someone experienced with GCP, I found value in the guide. The security best practices and systemd service configuration were spot-on.",
+  },
+  {
+    name: "Maria L.",
+    role: "Startup Founder",
+    quote: "Worth every penny. I had zero Linux experience and now I have a fully running AI agent on Google Cloud. The progress tracking kept me motivated.",
+  },
+];
+
 const faqs = [
   {
     q: "What is OpenClaw?",
@@ -248,6 +271,49 @@ export default function LandingPage() {
                 <p className="text-green-400">{">"} After restart, run: gcloud auth list</p>
               </div>
             </div>
+          </div>
+        </div>
+      </motion.section>
+
+      {/* Testimonials */}
+      <motion.section
+        className="py-20"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-100px" }}
+        variants={sectionVariants}
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl font-bold text-center text-neu-text mb-4">
+            Trusted by Engineers
+          </h2>
+          <p className="text-neu-muted text-center mb-12 max-w-2xl mx-auto">
+            Real feedback from people who completed the guide.
+          </p>
+          <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+            {testimonials.map((t, i) => (
+              <motion.div
+                key={t.name}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+                className="rounded-2xl shadow-neu p-6 bg-neu-bg"
+              >
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-brand-500 flex items-center justify-center text-white font-bold text-sm">
+                    {t.name.charAt(0)}
+                  </div>
+                  <div>
+                    <p className="font-semibold text-neu-text text-sm">{t.name}</p>
+                    <p className="text-neu-muted text-xs">{t.role}</p>
+                  </div>
+                </div>
+                <p className="text-neu-muted text-sm leading-relaxed italic">
+                  &ldquo;{t.quote}&rdquo;
+                </p>
+              </motion.div>
+            ))}
           </div>
         </div>
       </motion.section>

@@ -41,7 +41,7 @@ export async function PUT(req: NextRequest) {
   if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   const body = await req.json();
-  const { id, title, slug, goal, prerequisites, contentMd, expectedResult, commonErrors, status, tags } = body;
+  const { id, title, slug, goal, prerequisites, contentMd, expectedResult, commonErrors, status, tags, videoUrl } = body;
 
   const step = await prisma.step.update({
     where: { id },
@@ -58,6 +58,14 @@ export async function PUT(req: NextRequest) {
       version: { increment: 1 },
     },
   });
+
+  // Handle video URL
+  if (videoUrl !== undefined) {
+    await prisma.media.deleteMany({ where: { stepId: id, type: "video" } });
+    if (videoUrl) {
+      await prisma.media.create({ data: { stepId: id, type: "video", url: videoUrl } });
+    }
+  }
 
   // Audit log
   await prisma.auditLog.create({

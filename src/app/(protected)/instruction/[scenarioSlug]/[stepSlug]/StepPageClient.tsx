@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import StepNavigation from "@/components/instruction/StepNavigation";
 import StepContent from "@/components/instruction/StepContent";
 import AIAssistant from "@/components/instruction/AIAssistant";
 import ProgressTracker from "@/components/instruction/ProgressTracker";
 import Watermark from "@/components/instruction/Watermark";
+import Celebration from "@/components/ui/Celebration";
 
 interface NavStep {
   id: string;
@@ -32,6 +33,8 @@ interface StepData {
   expectedResult: string | null;
   commonErrors: string | null;
   completed: boolean;
+  moduleId: string;
+  videoUrl: string | null;
 }
 
 interface StepPageClientProps {
@@ -41,6 +44,11 @@ interface StepPageClientProps {
   totalSteps: number;
   completedSteps: number;
 }
+
+type CelebrationInfo = {
+  type: "module" | "milestone" | "complete";
+  message: string;
+} | null;
 
 export default function StepPageClient({
   scenarioSlug,
@@ -52,22 +60,89 @@ export default function StepPageClient({
   const [completed, setCompleted] = useState(step.completed);
   const [completedCount, setCompletedCount] = useState(initialCompleted);
   const [showAI, setShowAI] = useState(false);
+  const [celebration, setCelebration] = useState<CelebrationInfo>(null);
+
+  // Track step view event
+  useEffect(() => {
+    const startTime = Date.now();
+    fetch("/api/events", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ stepId: step.id, event: "VIEWED" }),
+    }).catch(() => {});
+
+    return () => {
+      const duration = Date.now() - startTime;
+      if (duration > 3000) {
+        navigator.sendBeacon(
+          "/api/events",
+          JSON.stringify({ stepId: step.id, event: "TIME_SPENT", durationMs: duration })
+        );
+      }
+    };
+  }, [step.id]);
+
+  function checkMilestone(newCount: number) {
+    // Check 100% completion
+    if (newCount === totalSteps) {
+      setCelebration({ type: "complete", message: "You have completed all steps in this guide! Your certificate is ready." });
+      return;
+    }
+
+    // Check module completion
+    const currentModule = navModules.find((m) => m.steps.some((s) => s.id === step.id));
+    if (currentModule) {
+      const moduleSteps = currentModule.steps;
+      const allModuleDone = moduleSteps.every((s) =>
+        s.id === step.id ? true : s.completed
+      );
+      if (allModuleDone) {
+        setCelebration({ type: "module", message: `You completed "${currentModule.title}"! Great progress.` });
+        return;
+      }
+    }
+
+    // Check percentage milestones
+    const pct = Math.round((newCount / totalSteps) * 100);
+    const prevPct = Math.round(((newCount - 1) / totalSteps) * 100);
+    for (const milestone of [75, 50, 25]) {
+      if (pct >= milestone && prevPct < milestone) {
+        setCelebration({ type: "milestone", message: `${milestone}% complete! Keep going, you're doing great.` });
+        return;
+      }
+    }
+  }
 
   async function toggleComplete() {
     const newValue = !completed;
     setCompleted(newValue);
-    setCompletedCount((prev) => prev + (newValue ? 1 : -1));
+    const newCount = completedCount + (newValue ? 1 : -1);
+    setCompletedCount(newCount);
 
     await fetch("/api/progress", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ stepId: step.id, completed: newValue }),
     });
+
+    if (newValue) {
+      checkMilestone(newCount);
+    }
   }
+
+  const handleCloseCelebration = useCallback(() => setCelebration(null), []);
 
   return (
     <div className="flex h-[calc(100vh-64px)] bg-neu-bg" onContextMenu={(e) => e.preventDefault()}>
       <Watermark />
+
+      {celebration && (
+        <Celebration
+          type={celebration.type}
+          message={celebration.message}
+          onClose={handleCloseCelebration}
+        />
+      )}
 
       {/* Left: Navigation */}
       <div className="hidden lg:block">
@@ -92,6 +167,7 @@ export default function StepPageClient({
             contentMd={step.contentMd}
             expectedResult={step.expectedResult}
             commonErrors={step.commonErrors}
+            videoUrl={step.videoUrl}
             completed={completed}
             onToggleComplete={toggleComplete}
           />

@@ -17,6 +17,7 @@ export default async function StepEditPage({
       },
       subSteps: { orderBy: { order: "asc" } },
       imagePrompts: { orderBy: { order: "asc" } },
+      media: { where: { type: "video" }, take: 1 },
     },
   });
 
@@ -43,6 +44,7 @@ export default async function StepEditPage({
           commonErrors: step.commonErrors || "",
           status: step.status,
           tags: step.tags,
+          videoUrl: step.media?.[0]?.url || "",
         }}
       />
     </div>

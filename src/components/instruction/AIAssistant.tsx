@@ -1,9 +1,20 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { motion } from "framer-motion";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+
+function formatCitations(text: string): string {
+  // Convert [Source: ...] markers to styled HTML-like markers that ReactMarkdown can render
+  return text.replace(
+    /\[Source: ([^\]]+)\]/g,
+    '`📎 $1`'
+  ).replace(
+    /\[General advice\]/g,
+    '`⚠️ General advice`'
+  );
+}
 
 interface AIAssistantProps {
   stepId: string;
@@ -234,7 +245,7 @@ export default function AIAssistant({ stepId }: AIAssistantProps) {
               {msg.role === "assistant" ? (
                 <div className="prose prose-sm max-w-none">
                   <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                    {msg.content}
+                    {formatCitations(msg.content)}
                   </ReactMarkdown>
                 </div>
               ) : (
@@ -250,7 +261,7 @@ export default function AIAssistant({ stepId }: AIAssistantProps) {
             <div className="rounded-2xl p-3.5 text-sm shadow-neu-inset-sm">
               <div className="prose prose-sm max-w-none">
                 <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                  {streamingContent}
+                  {formatCitations(streamingContent)}
                 </ReactMarkdown>
               </div>
             </div>
@@ -263,6 +274,32 @@ export default function AIAssistant({ stepId }: AIAssistantProps) {
             Analyzing...
           </div>
         )}
+        {/* Escalation: show after 3+ assistant messages */}
+        {messages.filter((m) => m.role === "assistant").length >= 3 && !loading && (
+          <div className="rounded-xl shadow-neu-xs p-3 text-center">
+            <p className="text-xs text-neu-muted mb-2">Still stuck?</p>
+            <motion.button
+              whileTap={{ scale: 0.95 }}
+              onClick={() => {
+                const snapshot = messages.map((m) => ({ role: m.role, content: m.content.slice(0, 500) }));
+                const subject = `Help with step (AI couldn't resolve)`;
+                fetch("/api/support", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ stepId, subject, message: "AI assistant could not resolve my issue. Please see conversation history.", aiSnapshot: snapshot }),
+                }).then(() => {
+                  setError("");
+                  const infoMsg: ChatMessage = { role: "assistant", content: "Support ticket created! Our team will review your issue and the AI conversation context.", timestamp: new Date() };
+                  setMessages((prev) => [...prev, infoMsg]);
+                }).catch(() => setError("Failed to create support ticket"));
+              }}
+              className="px-4 py-1.5 rounded-full text-xs font-medium shadow-neu-xs text-amber-600 hover:shadow-neu-inset-sm transition-all"
+            >
+              Create Support Ticket
+            </motion.button>
+          </div>
+        )}
+
         <div ref={messagesEndRef} />
       </div>
 

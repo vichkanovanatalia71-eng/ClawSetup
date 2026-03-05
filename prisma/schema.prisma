@@ -45,6 +45,7 @@ model User {
   progress      UserProgress[]
   aiTickets     AITicket[]
   auditLogs     AuditLog[]
+  certificates  Certificate[]
 }
 
 model Account {
@@ -125,7 +126,8 @@ model Scenario {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  modules Module[]
+  modules      Module[]
+  certificates Certificate[]
 }
 
 model Module {
@@ -164,6 +166,7 @@ model Step {
   imagePrompts ImagePrompt[]
   progress UserProgress[]
   aiTickets AITicket[]
+  troubleshootTrees TroubleshootTree[]
 
   @@unique([moduleId, slug])
 }
@@ -273,6 +276,87 @@ model StepFeedback {
 
   @@unique([userId, stepId])
   @@index([stepId])
+}
+
+model Certificate {
+  id              String   @id @default(cuid())
+  userId          String
+  scenarioId      String
+  completedAt     DateTime @default(now())
+  certificateHash String   @unique
+  createdAt       DateTime @default(now())
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  scenario Scenario @relation(fields: [scenarioId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, scenarioId])
+  @@index([userId])
+}
+
+model StepEvent {
+  id         String   @id @default(cuid())
+  userId     String
+  stepId     String
+  event      String
+  durationMs Int?
+  createdAt  DateTime @default(now())
+
+  @@index([userId])
+  @@index([stepId])
+  @@index([createdAt])
+}
+
+model SupportTicket {
+  id         String   @id @default(cuid())
+  userId     String
+  stepId     String?
+  subject    String
+  message    String   @db.Text
+  aiSnapshot Json?
+  status     String   @default("OPEN")
+  adminNotes String?  @db.Text
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([userId])
+  @@index([status])
+}
+
+model NPSResponse {
+  id        String   @id @default(cuid())
+  userId    String
+  score     Int
+  comment   String?  @db.Text
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([createdAt])
+}
+
+model TroubleshootTree {
+  id        String   @id @default(cuid())
+  stepId    String
+  title     String
+  createdAt DateTime @default(now())
+
+  step  Step               @relation(fields: [stepId], references: [id], onDelete: Cascade)
+  nodes TroubleshootNode[]
+
+  @@index([stepId])
+}
+
+model TroubleshootNode {
+  id       String  @id @default(cuid())
+  treeId   String
+  parentId String?
+  question String  @db.Text
+  answer   String? @db.Text
+  isLeaf   Boolean @default(false)
+  order    Int     @default(0)
+
+  tree TroubleshootTree @relation(fields: [treeId], references: [id], onDelete: Cascade)
+
+  @@index([treeId])
 }
 
 model AuditLog {
