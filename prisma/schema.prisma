@@ -1,0 +1,244 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  EDITOR
+  ADMIN
+  SUPERADMIN
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  PAST_DUE
+  CANCELED
+  UNPAID
+  TRIALING
+}
+
+enum StepStatus {
+  DRAFT
+  PUBLISHED
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  passwordHash  String?
+  role          Role      @default(USER)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  lastLoginAt   DateTime?
+
+  accounts      Account[]
+  sessions      Session[]
+  subscription  Subscription?
+  progress      UserProgress[]
+  aiTickets     AITicket[]
+  auditLogs     AuditLog[]
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model Subscription {
+  id                   String             @id @default(cuid())
+  userId               String             @unique
+  stripeCustomerId     String?            @unique
+  stripeSubscriptionId String?            @unique
+  stripePriceId        String?
+  status               SubscriptionStatus @default(ACTIVE)
+  plan                 String             @default("monthly")
+  currentPeriodStart   DateTime?
+  currentPeriodEnd     DateTime?
+  cancelAtPeriodEnd    Boolean            @default(false)
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  payments Payment[]
+}
+
+model Payment {
+  id               String   @id @default(cuid())
+  subscriptionId   String
+  stripePaymentId  String?  @unique
+  amount           Int
+  currency         String   @default("usd")
+  status           String
+  invoiceUrl       String?
+  createdAt        DateTime @default(now())
+
+  subscription Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+}
+
+model Scenario {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  name        String
+  description String?  @db.Text
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  modules Module[]
+}
+
+model Module {
+  id          String   @id @default(cuid())
+  scenarioId  String
+  title       String
+  description String?  @db.Text
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  scenario Scenario @relation(fields: [scenarioId], references: [id], onDelete: Cascade)
+  steps    Step[]
+}
+
+model Step {
+  id              String     @id @default(cuid())
+  moduleId        String
+  title           String
+  slug            String
+  goal            String?    @db.Text
+  prerequisites   String?    @db.Text
+  contentMd       String     @db.Text
+  expectedResult  String?    @db.Text
+  commonErrors    String?    @db.Text
+  order           Int        @default(0)
+  version         Int        @default(1)
+  status          StepStatus @default(DRAFT)
+  tags            String[]
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+
+  module   Module    @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  subSteps SubStep[]
+  media    Media[]
+  imagePrompts ImagePrompt[]
+  progress UserProgress[]
+  aiTickets AITicket[]
+
+  @@unique([moduleId, slug])
+}
+
+model SubStep {
+  id        String   @id @default(cuid())
+  stepId    String
+  title     String
+  contentMd String   @db.Text
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  step Step @relation(fields: [stepId], references: [id], onDelete: Cascade)
+}
+
+model Media {
+  id       String  @id @default(cuid())
+  stepId   String
+  type     String  @default("image")
+  url      String
+  alt      String?
+  order    Int     @default(0)
+
+  step Step @relation(fields: [stepId], references: [id], onDelete: Cascade)
+}
+
+model ImagePrompt {
+  id               String  @id @default(cuid())
+  stepId           String
+  promptText       String  @db.Text
+  styleNotes       String?
+  requiredElements String? @db.Text
+  order            Int     @default(0)
+
+  step Step @relation(fields: [stepId], references: [id], onDelete: Cascade)
+}
+
+model UserProgress {
+  id          String   @id @default(cuid())
+  userId      String
+  stepId      String
+  completed   Boolean  @default(false)
+  completedAt DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  step Step @relation(fields: [stepId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, stepId])
+}
+
+model AITicket {
+  id         String   @id @default(cuid())
+  userId     String
+  stepId     String
+  inputText  String?  @db.Text
+  imageRef   String?
+  aiAnswer   String?  @db.Text
+  tags       String[]
+  createdAt  DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  step Step @relation(fields: [stepId], references: [id], onDelete: Cascade)
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  actorId   String?
+  action    String
+  entity    String
+  entityId  String?
+  before    Json?
+  after     Json?
+  ip        String?
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  actor User? @relation(fields: [actorId], references: [id], onDelete: SetNull)
+}

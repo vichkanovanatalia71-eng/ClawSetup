@@ -1,0 +1,74 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: #ffffff;
+    --foreground: #0a0a0a;
+  }
+}
+
+@layer utilities {
+  .no-select {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+}
+
+/* Code block styling */
+pre code {
+  @apply block overflow-x-auto p-4 text-sm;
+}
+
+code {
+  @apply bg-gray-100 px-1.5 py-0.5 rounded text-sm font-mono;
+}
+
+pre code {
+  @apply bg-transparent p-0;
+}
+
+/* Print protection */
+@media print {
+  .protected-content {
+    display: none !important;
+  }
+
+  .print-warning {
+    display: block !important;
+    text-align: center;
+    font-size: 24px;
+    padding: 100px 20px;
+  }
+
+  .print-warning::after {
+    content: "This content is protected. Printing is not allowed. Please access this content through your subscription at ClawSetup.";
+  }
+}
+
+.print-warning {
+  display: none;
+}
+
+/* Watermark */
+.watermark-overlay {
+  pointer-events: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 9999;
+  opacity: 0.04;
+  font-size: 14px;
+  color: #000;
+  overflow: hidden;
+  transform: rotate(-30deg);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 80px;
+  padding: 40px;
+}
