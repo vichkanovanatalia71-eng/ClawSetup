@@ -42,9 +42,9 @@ async function main() {
       name: "Remote: Google Cloud VM (Ubuntu)",
       nameUk: "Віддалено: Google Cloud VM (Ubuntu)",
       description:
-        "Full setup on a Google Cloud VM with Ubuntu 24.04. Includes VM creation, SSH, Node.js, OpenClaw, systemd service, Telegram, Dashboard, and backups.",
+        "Full setup on a Google Cloud VM with Ubuntu 24.04. Includes VM creation, SSH, Node.js, OpenClaw, systemd service, Telegram, Dashboard, and backups. Almost the same can be done on a local machine, but a VM is often safer: it will only have data for bots/integrations, with less risk of affecting personal files on your PC.",
       descriptionUk:
-        "Повне налаштування на Google Cloud VM з Ubuntu 24.04. Включає створення VM, SSH, Node.js, OpenClaw, systemd сервіс, Telegram, Dashboard та резервні копії.",
+        "Повне налаштування на Google Cloud VM з Ubuntu 24.04. Включає створення VM, SSH, Node.js, OpenClaw, systemd сервіс, Telegram, Dashboard та резервні копії. Майже те саме можна зробити на локальній машині, але VM часто безпечніше: там будуть тільки дані для бота/інтеграцій, і менше ризику зачепити персональні файли на вашому ПК.",
       order: 1,
     },
   });
@@ -96,6 +96,61 @@ async function main() {
 
   // Steps
   const steps = [
+    {
+      moduleOrder: 0,
+      title: "Introduction: Before You Start",
+      titleUk: "Вступ: Перед початком",
+      slug: "intro-before-you-start",
+      order: -1,
+      goal: "Understand the terminal rules, prepare your variables, and learn about SSH fingerprints before starting the setup.",
+      goalUk: "Ознайомтесь з правилами терміналу, підготуйте змінні та дізнайтесь про SSH fingerprint перед початком налаштування.",
+      prerequisites: "None.",
+      prerequisitesUk: "Немає.",
+      contentMd: `## Important: Copy/Paste Rules
+
+In this guide there are two types of consoles:
+- **Local console (your PC)** — PowerShell/Terminal on your computer
+- **VM console (SSH)** — terminal connected to your VM (Ubuntu) via SSH
+
+**Terminal rules:**
+- **Paste a command:** right-click in the terminal — the command will be pasted. Then press Enter.
+- **Copy from console:** select text with mouse and press Enter — the selection will be copied.
+
+**nano (editor on server):**
+- Save: \`Ctrl+O\`, then \`Enter\`
+- Exit: \`Ctrl+X\`
+- Paste text: right-click in terminal (or \`Shift+Insert\`)
+
+If the console asks **yes/no** — type \`yes\` and press Enter.
+
+## Prepare Variables (Replace Once — Then Just Copy/Paste)
+
+**Recommendation:** Copy this guide to your notes (Notion/Google Doc) and do a mass find-and-replace of variables with your values. Then you just copy command blocks and paste without manual edits.
+
+**Variable template** (replace with your values):
+- \`%user%\` — your Linux username on the VM
+- \`%vm-name%\` — VM name in Google Cloud
+- \`%IP%\` — external public IP of your VM
+- \`%project-id%\` — Google Cloud Project ID
+- \`%region%\` — region (e.g. \`us-central1\`)
+- \`%zone%\` — zone (e.g. \`us-central1-a\`)
+
+## What is SSH Fingerprint (Host Key)?
+
+When you connect via SSH, your PC saves a "fingerprint" of the server — the **host key fingerprint**. This is for security: so you don't accidentally connect to the wrong server.
+
+If you reinstalled the VM, the host key may change, and SSH will warn: **"REMOTE HOST IDENTIFICATION HAS CHANGED!"** In this case, you delete the old fingerprint record from your PC and reconnect.
+
+## If You Get Stuck
+
+If at any point you're lost or something doesn't work: open any AI chat, take a screenshot of the error/screen and write: "I was doing step X, expected Y, got Z. How to fix?" This is a normal way to go through such guides without experience.`,
+      expectedResult: "You understand the terminal rules and have prepared your variable values for the rest of the guide.",
+      expectedResultUk: "Ви розумієте правила терміналу та підготували значення змінних для решти інструкції.",
+      commonErrors: `- Not reading the intro — leads to confusion with copy/paste in terminal
+- Forgetting to replace variables — commands will fail if placeholders like %user% are not replaced`,
+      commonErrorsUk: `- Не прочитали вступ — призводить до плутанини з копіюванням/вставкою в терміналі
+- Забули замінити змінні — команди не спрацюють, якщо плейсхолдери типу %user% не замінені`,
+    },
     {
       moduleOrder: 0,
       title: "Step 0: GCP Project Setup",
@@ -167,7 +222,12 @@ Continue → Done. **Do NOT create a JSON key.**
 **Benefits:**
 - IP doesn't change when you Stop/Start VM
 - Convenient for SSH, tunnels, DNS, automations
-- Saves time if you frequently turn off VM
+- Saves time if you frequently turn off VM and connect via SSH (not from web)
+
+**Pricing:**
+- If a static IP is reserved but **not attached** to a VM — there is usually a small charge for the "unused" IP
+- Usually cheaper than keeping the VM running 24/7 just for a stable IP
+- **Especially important** if you use an expensive/powerful VM and only turn it on for a few hours per day
 
 **How to reserve:**
 1. VPC network → IP addresses
@@ -669,6 +729,8 @@ openclaw models status
       prerequisitesUk: "Gateway працює (Крок 9).",
       contentMd: `## Start SSH Tunnel (on your PC)
 
+> This is useful if you want more control and more manual configuration options.
+
 \`\`\`bash
 ssh -L 18789:127.0.0.1:18789 your_user@YOUR_IP -i ~/.ssh/openclaw_vm
 \`\`\`
@@ -800,33 +862,75 @@ sudo fail2ban-client status sshd || true
 
 At this point everything is working. Before making further changes, create a backup so you can restore within 5-10 minutes if something breaks.
 
-## Option A: Snapshot (Recommended)
+**Make it a habit** to create a backup before every major change to system components or settings.
+
+Google Cloud has 2 main approaches:
+- **Snapshot** — backs up a specific disk (usually the boot disk). Suitable for most cases. A snapshot is a global resource within a project.
+- **Machine image** — backs up the entire VM with all attached disks (useful if the VM has multiple disks or complex configuration).
+
+If unsure — use **Snapshots** (simple, fast, standard approach).
+
+## A) Snapshot: How to Create a Backup (Web Console)
+
+This is done in the Google Cloud Console (web), not in SSH.
 
 1. Google Cloud Console → **Compute Engine → Disks**
-2. Find your VM's boot disk
+2. Find your VM's boot disk (usually named like your VM)
 3. Click the disk → **Create snapshot**
-4. Name: \`openclaw-boot-YYYYMMDD-HHMM\`
-5. Snapshot type: **STANDARD**
-6. Click **Create**
+4. Fill in:
+   - Name: \`openclaw-boot-YYYYMMDD-HHMM\`
+   - Snapshot type: **STANDARD** (recommended) or **ARCHIVE** (cheaper for long-term storage, slower restore)
+   - Location: can leave "based on disk's location" (default)
+5. Click **Create**
 
 > **Naming tip:** Name snapshots to show what they're "before": \`openclaw-before-caddy-change-20240115\`
 
-## Restore from Snapshot
+## B) Snapshot: How to Restore
 
-1. **Compute Engine → Snapshots**
-2. Find your snapshot → **Create disk**
-3. Create a **new VM** with this disk as boot disk
+> **Important:** A snapshot itself doesn't become a VM. First you create a new disk from the snapshot, then either create a new VM with that disk or swap the boot disk on an existing VM.
 
-## Option B: Machine Image (Full VM Backup)
+### B1) Restore to a NEW VM (Recommended — simpler and safer)
 
-1. **Compute Engine → VM instances**
-2. Select your VM → **More actions → Create machine image**
+1. **Compute Engine → Snapshots** → find your snapshot
+2. Click snapshot → **Create disk**
+3. On the Create disk screen:
+   - Name: \`openclaw-restored-disk-YYYYMMDD\`
+   - Type/Size: can leave as was (or larger)
+   - Zone: select the same zone where the VM will be
+4. Click **Create**
+5. Now create a new VM:
+   - **Compute Engine → VM instances → Create instance**
+   - In Boot disk section → **Change** → **Existing disks** tab → select the new disk
+   - Create the VM
+
+**Advantages:** the old VM stays as a "reserve", minimal risk.
+
+### B2) Restore to the Old VM (via boot disk swap)
+
+This path requires more care. General logic: create a new disk from snapshot → stop the VM → swap the boot disk. Refer to Google documentation for specifics, as the Console UI may vary.
+
+## C) Machine Image: Full VM Backup
+
+Machine image is suitable when:
+- The VM has multiple disks (boot + data)
+- You want a single backup of everything at once
+
+### C1) Create Machine Image
+1. **Compute Engine → VM instances** → open your VM
+2. **More actions (⋮)** → **Create machine image**
 3. Name: \`openclaw-machine-image-YYYYMMDD\`
 4. **Create**
 
-To restore: **Machine images → select image → Create instance**
+### C2) Restore from Machine Image
+1. **Compute Engine → Machine images**
+2. Select image → **Create instance**
+3. Choose zone/VM type → **Create**
 
-## Via gcloud CLI (Optional)
+## D) Backup Automation
+
+For multiple VMs or "as a service" — Google has **Backup and DR Service** for centralized backup/restore. For personal use, snapshots/machine images are usually sufficient.
+
+## E) Via gcloud CLI (Optional)
 
 \`\`\`bash
 # Create snapshot
@@ -838,13 +942,65 @@ gcloud compute snapshots create SNAPSHOT_NAME \\
 gcloud compute disks create NEW_DISK_NAME \\
   --source-snapshot=SNAPSHOT_NAME \\
   --zone=ZONE
-\`\`\``,
+\`\`\`
+
+Then select this disk as boot disk when creating a new VM.`,
       expectedResult: "A snapshot or machine image exists that you can use to restore the VM at any time.",
       expectedResultUk: "Snapshot або machine image існує, який можна використати для відновлення VM у будь-який час.",
       commonErrors: `- "Disk is in use" — you don't need to stop the VM for snapshots, they work on running VMs
 - "Insufficient permissions" — make sure your GCP account has compute.snapshots.create permission`,
       commonErrorsUk: `- "Disk is in use" — не потрібно зупиняти VM для snapshots, вони працюють на запущених VM
 - "Insufficient permissions" — переконайтеся, що ваш GCP-обліковий запис має дозвіл compute.snapshots.create`,
+    },
+    {
+      moduleOrder: 6,
+      title: "Step 18: Final Checklist",
+      titleUk: "Крок 18: Фінальний чекліст",
+      slug: "step-18-checklist",
+      order: 18,
+      goal: "Verify that all components are properly set up by going through the final checklist.",
+      goalUk: "Перевірте, що всі компоненти правильно налаштовані, пройшовши фінальний чекліст.",
+      prerequisites: "All previous steps completed (Steps 0-17).",
+      prerequisitesUk: "Всі попередні кроки завершені (Кроки 0-17).",
+      contentMd: `## GCP Checklist
+
+- [ ] Billing enabled
+- [ ] All required APIs enabled
+- [ ] Service Account created with correct roles
+- [ ] SA attached to VM
+- [ ] Access scopes: full cloud-platform
+- [ ] (Optional) Static IP reserved
+
+## VM Checklist
+
+- [ ] Ubuntu 24.04, 2 vCPU / 4 GB RAM
+- [ ] SSH key added (global or instance-level)
+
+## Software Checklist
+
+- [ ] \`apt update/upgrade\` — done
+- [ ] \`gcloud\` — installed and working
+- [ ] ADC credentials file exists
+- [ ] Project ID is correct
+- [ ] \`node -v\` — shows v22+
+- [ ] \`openclaw --version\` — installed
+- [ ] \`.env\` file — correct values
+- [ ] Gateway — running on port 18789
+- [ ] Autostart — enabled (linger + systemd enable)
+- [ ] Onboard — completed
+- [ ] Telegram — bot connected
+- [ ] Dashboard — accessible via SSH tunnel
+- [ ] Backup — snapshot or machine image created
+
+If all items are checked — congratulations, your OpenClaw setup is complete!
+
+The next guide will cover additional settings and usability improvements.`,
+      expectedResult: "All checklist items are verified. OpenClaw is fully set up and operational.",
+      expectedResultUk: "Всі пункти чекліста перевірені. OpenClaw повністю налаштований та працює.",
+      commonErrors: `- Any unchecked item — go back to the corresponding step and complete it
+- If unsure about a step — re-run the verification commands from that step`,
+      commonErrorsUk: `- Будь-який непозначений пункт — поверніться до відповідного кроку та завершіть його
+- Якщо не впевнені щодо кроку — повторно виконайте команди перевірки з того кроку`,
     },
   ];
 
