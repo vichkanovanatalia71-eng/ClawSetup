@@ -20,6 +20,19 @@ async function main() {
   });
   console.log("Admin user created:", admin.email);
 
+  // Promote owner to SUPERADMIN
+  const ownerEmail = "vichkanovanatalia71@gmail.com";
+  const owner = await prisma.user.findUnique({ where: { email: ownerEmail } });
+  if (owner) {
+    await prisma.user.update({
+      where: { email: ownerEmail },
+      data: { role: "SUPERADMIN" },
+    });
+    console.log("Owner promoted to SUPERADMIN:", ownerEmail);
+  } else {
+    console.log("Owner not found (register first, then re-run seed):", ownerEmail);
+  }
+
   // Create scenario: Remote (Google Cloud VM)
   const remoteScenario = await prisma.scenario.upsert({
     where: { slug: "remote-gcp" },
