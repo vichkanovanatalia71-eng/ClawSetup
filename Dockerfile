@@ -1,12 +1,12 @@
 FROM node:20-alpine AS base
 
-# Install dependencies only when needed
+# Install all dependencies (including dev) for building
 FROM base AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 COPY package.json package-lock.json ./
 COPY prisma ./prisma
-RUN npm ci --omit=dev
+RUN npm ci
 
 # Build the application
 FROM base AS builder
