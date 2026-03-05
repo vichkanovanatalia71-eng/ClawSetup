@@ -42,24 +42,24 @@ export default async function DashboardPage() {
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-12">
-      <h1 className="text-3xl font-bold text-gray-900 mb-2">Dashboard</h1>
-      <p className="text-gray-500 mb-8">
+      <h1 className="text-3xl font-bold text-neu-text mb-2">Dashboard</h1>
+      <p className="text-neu-muted mb-8">
         Welcome back, {session.user.name || session.user.email}!
       </p>
 
       {!hasActiveSubscription && (
-        <div className="bg-amber-50 border border-amber-200 rounded-lg p-6 mb-8">
-          <h2 className="font-semibold text-amber-900 mb-2">
+        <div className="rounded-2xl shadow-neu-sm p-6 mb-8 border-l-4 border-amber-400 bg-neu-bg">
+          <h2 className="font-semibold text-neu-text mb-2">
             Subscription Required
           </h2>
-          <p className="text-amber-800 text-sm mb-4">
+          <p className="text-neu-muted text-sm mb-4">
             You need an active subscription to access the setup guide.
           </p>
           <SubscribeButton />
         </div>
       )}
 
-      <h2 className="text-xl font-semibold text-gray-900 mb-4">
+      <h2 className="text-xl font-semibold text-neu-text mb-4">
         Choose Your Setup Scenario
       </h2>
 
@@ -79,31 +79,29 @@ export default async function DashboardPage() {
               ? Math.round((completedSteps / totalSteps) * 100)
               : 0;
 
-          const firstStep = scenario.modules[0]?.steps[0];
-
           return (
             <div
               key={scenario.id}
-              className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-md transition"
+              className="rounded-2xl shadow-neu p-6 bg-neu-bg hover:shadow-neu-sm transition-all duration-200"
             >
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              <h3 className="text-lg font-semibold text-neu-text mb-2">
                 {scenario.name}
               </h3>
               {scenario.description && (
-                <p className="text-gray-500 text-sm mb-4">
+                <p className="text-neu-muted text-sm mb-4">
                   {scenario.description}
                 </p>
               )}
               <div className="mb-4">
-                <div className="flex justify-between text-sm mb-1">
-                  <span className="text-gray-500">
+                <div className="flex justify-between text-sm mb-2">
+                  <span className="text-neu-muted">
                     {completedSteps}/{totalSteps} steps
                   </span>
-                  <span className="text-gray-500">{percentage}%</span>
+                  <span className="text-neu-muted">{percentage}%</span>
                 </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
+                <div className="neu-progress-track">
                   <div
-                    className="bg-brand-600 h-2 rounded-full transition-all"
+                    className="neu-progress-fill"
                     style={{ width: `${percentage}%` }}
                   />
                 </div>
@@ -111,12 +109,12 @@ export default async function DashboardPage() {
               {hasActiveSubscription ? (
                 <Link
                   href={`/instruction/${scenario.slug}`}
-                  className="inline-block bg-brand-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-brand-700 transition"
+                  className="inline-block neu-btn-primary rounded-full px-6 py-2.5 text-sm"
                 >
                   {completedSteps > 0 ? "Continue" : "Start"}
                 </Link>
               ) : (
-                <span className="text-gray-400 text-sm">
+                <span className="text-neu-muted text-sm">
                   Subscribe to access
                 </span>
               )}
@@ -125,7 +123,7 @@ export default async function DashboardPage() {
         })}
 
         {scenarios.length === 0 && (
-          <div className="col-span-2 text-center py-12 text-gray-400">
+          <div className="col-span-2 text-center py-12 text-neu-muted">
             <p>No scenarios available yet. Content is being prepared.</p>
           </div>
         )}
@@ -154,7 +152,7 @@ function SubscribeButton() {
     >
       <button
         type="submit"
-        className="bg-brand-600 text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-brand-700 transition"
+        className="neu-btn-primary rounded-full px-6 py-2.5 text-sm"
       >
         Subscribe Now — $29/month
       </button>

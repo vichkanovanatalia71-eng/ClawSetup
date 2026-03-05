@@ -1,4 +1,8 @@
+"use client";
+
 import Link from "next/link";
+import { motion, AnimatePresence } from "framer-motion";
+import { useState } from "react";
 
 const benefits = [
   "Fully configured VM on Google Cloud for OpenClaw (Ubuntu 24.04)",
@@ -50,97 +54,188 @@ const faqs = [
   },
 ];
 
+function FAQItem({ faq }: { faq: { q: string; a: string } }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="rounded-2xl shadow-neu-sm bg-neu-bg overflow-hidden">
+      <button
+        onClick={() => setOpen(!open)}
+        className="w-full flex justify-between items-center px-6 py-5 text-left"
+      >
+        <span className="font-semibold text-neu-text">{faq.q}</span>
+        <motion.svg
+          animate={{ rotate: open ? 180 : 0 }}
+          transition={{ duration: 0.2 }}
+          className="w-5 h-5 text-neu-muted flex-shrink-0 ml-4"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        </motion.svg>
+      </button>
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            <p className="px-6 pb-5 text-neu-muted text-sm leading-relaxed">{faq.a}</p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+const sectionVariants = {
+  hidden: { opacity: 0, y: 30 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
+};
+
 export default function LandingPage() {
   return (
-    <div>
+    <div className="bg-neu-bg">
       {/* Hero */}
-      <section className="bg-gradient-to-br from-brand-50 to-white py-20">
+      <section className="py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-6">
-            Set Up OpenClaw
-            <br />
-            <span className="text-brand-600">Without the Pain</span>
-          </h1>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-8">
-            Interactive step-by-step guide with AI assistance on every step.
-            From zero to a fully running OpenClaw agent on Google Cloud or your local machine.
-          </p>
-          <div className="flex justify-center gap-4">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            <div className="inline-block rounded-2xl shadow-neu p-10 mb-8">
+              <h1 className="text-4xl sm:text-5xl font-bold text-neu-text mb-4">
+                Set Up OpenClaw
+                <br />
+                <span className="bg-gradient-to-r from-blue-600 to-brand-500 bg-clip-text text-transparent">
+                  Without the Pain
+                </span>
+              </h1>
+              <p className="text-lg text-neu-muted max-w-2xl mx-auto">
+                Interactive step-by-step guide with AI assistance on every step.
+                From zero to a fully running OpenClaw agent on Google Cloud or your local machine.
+              </p>
+            </div>
+          </motion.div>
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3, duration: 0.5 }}
+            className="flex justify-center gap-4 flex-wrap"
+          >
             <Link
               href="/register"
-              className="bg-brand-600 text-white px-8 py-3 rounded-lg text-lg font-medium hover:bg-brand-700 transition shadow-lg shadow-brand-600/25"
+              className="neu-btn-primary rounded-full px-8 py-3.5 text-lg"
             >
               Start Setup Guide
             </Link>
             <Link
               href="#features"
-              className="border border-gray-300 text-gray-700 px-8 py-3 rounded-lg text-lg font-medium hover:bg-gray-50 transition"
+              className="neu-btn rounded-full px-8 py-3.5 text-lg text-neu-muted hover:text-neu-text"
             >
               See What You Get
             </Link>
-          </div>
+          </motion.div>
         </div>
       </section>
 
       {/* What you get */}
-      <section id="features" className="py-20">
+      <motion.section
+        id="features"
+        className="py-20"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-100px" }}
+        variants={sectionVariants}
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-center text-gray-900 mb-4">
+          <h2 className="text-3xl font-bold text-center text-neu-text mb-4">
             What You Get After Completing the Guide
           </h2>
-          <p className="text-gray-600 text-center mb-12 max-w-2xl mx-auto">
+          <p className="text-neu-muted text-center mb-12 max-w-2xl mx-auto">
             Every item below is a verified, working result you will have at the end.
           </p>
           <div className="grid md:grid-cols-2 gap-4 max-w-4xl mx-auto">
             {benefits.map((b, i) => (
-              <div key={i} className="flex gap-3 p-4 rounded-lg bg-green-50 border border-green-100">
-                <svg className="w-6 h-6 text-green-500 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-                <span className="text-gray-700 text-sm">{b}</span>
-              </div>
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, x: i % 2 === 0 ? -20 : 20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.05 }}
+                className="flex gap-3 p-4 rounded-xl shadow-neu-sm bg-neu-bg"
+              >
+                <div className="w-6 h-6 rounded-lg shadow-neu-inset-sm flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <svg className="w-3.5 h-3.5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <span className="text-neu-text text-sm">{b}</span>
+              </motion.div>
             ))}
           </div>
         </div>
-      </section>
+      </motion.section>
 
       {/* How it works */}
-      <section className="py-20 bg-gray-50">
+      <motion.section
+        className="py-20"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-100px" }}
+        variants={sectionVariants}
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">
+          <h2 className="text-3xl font-bold text-center text-neu-text mb-12">
             Step-by-Step Structure
           </h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto">
-            {steps.map((s) => (
-              <div key={s.num} className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-                <div className="w-10 h-10 bg-brand-100 text-brand-700 rounded-lg flex items-center justify-center font-bold text-sm mb-3">
+            {steps.map((s, i) => (
+              <motion.div
+                key={s.num}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.08 }}
+                className="rounded-2xl shadow-neu p-6 bg-neu-bg"
+              >
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-brand-600 shadow-neu-xs flex items-center justify-center font-bold text-white text-sm mb-4">
                   {s.num}
                 </div>
-                <h3 className="font-semibold text-gray-900 mb-1">{s.title}</h3>
-                <p className="text-gray-500 text-sm">{s.desc}</p>
-              </div>
+                <h3 className="font-semibold text-neu-text mb-1">{s.title}</h3>
+                <p className="text-neu-muted text-sm">{s.desc}</p>
+              </motion.div>
             ))}
           </div>
           <div className="text-center mt-8">
-            <p className="text-gray-500 text-sm">
+            <p className="text-neu-muted text-sm">
               Each step has interactive checklists, copy-paste commands, and an AI assistant ready to help.
             </p>
           </div>
         </div>
-      </section>
+      </motion.section>
 
       {/* AI Feature */}
-      <section className="py-20">
+      <motion.section
+        className="py-20"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-100px" }}
+        variants={sectionVariants}
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl mx-auto text-center">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">
+            <h2 className="text-3xl font-bold text-neu-text mb-4">
               AI Assistant on Every Step
             </h2>
-            <p className="text-gray-600 mb-8">
+            <p className="text-neu-muted mb-8">
               Stuck on an error? Paste the error text or upload a screenshot.
               The AI knows exactly which step you are on and gives you specific fixes.
             </p>
-            <div className="bg-gray-900 rounded-xl p-6 text-left">
+            <div className="rounded-2xl shadow-neu-inset bg-gray-900 p-6 text-left">
               <div className="flex gap-2 mb-4">
                 <div className="w-3 h-3 rounded-full bg-red-500" />
                 <div className="w-3 h-3 rounded-full bg-yellow-500" />
@@ -155,20 +250,28 @@ export default function LandingPage() {
             </div>
           </div>
         </div>
-      </section>
+      </motion.section>
 
       {/* Pricing */}
-      <section id="pricing" className="py-20 bg-gray-50">
+      <motion.section
+        id="pricing"
+        className="py-20"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-100px" }}
+        variants={sectionVariants}
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">
+          <h2 className="text-3xl font-bold text-center text-neu-text mb-12">
             Simple Pricing
           </h2>
           <div className="max-w-lg mx-auto">
-            <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-8">
-              <h3 className="text-xl font-bold text-gray-900 mb-2">Monthly Access</h3>
-              <div className="flex items-baseline gap-2 mb-4">
-                <span className="text-4xl font-bold text-gray-900">$29</span>
-                <span className="text-gray-500">/month</span>
+            <div className="rounded-2xl shadow-neu p-8 bg-neu-bg relative overflow-hidden">
+              <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-blue-500 to-brand-600" />
+              <h3 className="text-xl font-bold text-neu-text mb-2">Monthly Access</h3>
+              <div className="flex items-baseline gap-2 mb-6">
+                <span className="text-5xl font-bold text-neu-text">$29</span>
+                <span className="text-neu-muted">/month</span>
               </div>
               <ul className="space-y-3 mb-8">
                 {[
@@ -178,57 +281,66 @@ export default function LandingPage() {
                   "Progress saving & checklists",
                   "Cancel anytime in one click",
                 ].map((f) => (
-                  <li key={f} className="flex gap-2 text-gray-600 text-sm">
-                    <svg className="w-5 h-5 text-brand-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
+                  <li key={f} className="flex gap-3 text-neu-text text-sm">
+                    <div className="w-5 h-5 rounded-md shadow-neu-inset-sm flex items-center justify-center flex-shrink-0">
+                      <svg className="w-3 h-3 text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                      </svg>
+                    </div>
                     {f}
                   </li>
                 ))}
               </ul>
               <Link
                 href="/register"
-                className="block w-full bg-brand-600 text-white text-center py-3 rounded-lg font-medium hover:bg-brand-700 transition"
+                className="block w-full neu-btn-primary rounded-full text-center py-3.5 text-base"
               >
                 Get Started
               </Link>
             </div>
           </div>
         </div>
-      </section>
+      </motion.section>
 
       {/* FAQ */}
-      <section id="faq" className="py-20">
+      <motion.section
+        id="faq"
+        className="py-20"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-100px" }}
+        variants={sectionVariants}
+      >
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">
+          <h2 className="text-3xl font-bold text-center text-neu-text mb-12">
             Frequently Asked Questions
           </h2>
-          <div className="space-y-6">
+          <div className="space-y-4">
             {faqs.map((faq) => (
-              <div key={faq.q} className="border-b border-gray-200 pb-6">
-                <h3 className="font-semibold text-gray-900 mb-2">{faq.q}</h3>
-                <p className="text-gray-600 text-sm">{faq.a}</p>
-              </div>
+              <FAQItem key={faq.q} faq={faq} />
             ))}
           </div>
         </div>
-      </section>
+      </motion.section>
 
       {/* CTA */}
-      <section className="py-20 bg-brand-600">
-        <div className="max-w-7xl mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold text-white mb-4">
-            Ready to Set Up OpenClaw?
-          </h2>
-          <p className="text-brand-100 mb-8 max-w-xl mx-auto">
-            Join the guide, follow the steps, and have your AI agent running in a few hours — not days.
-          </p>
-          <Link
-            href="/register"
-            className="inline-block bg-white text-brand-700 px-8 py-3 rounded-lg text-lg font-medium hover:bg-brand-50 transition"
-          >
-            Start Now
-          </Link>
+      <section className="py-20">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="max-w-3xl mx-auto rounded-2xl shadow-neu p-12 text-center bg-neu-bg relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-brand-600/5 pointer-events-none" />
+            <h2 className="text-3xl font-bold text-neu-text mb-4 relative">
+              Ready to Set Up OpenClaw?
+            </h2>
+            <p className="text-neu-muted mb-8 max-w-xl mx-auto relative">
+              Join the guide, follow the steps, and have your AI agent running in a few hours — not days.
+            </p>
+            <Link
+              href="/register"
+              className="relative inline-block neu-btn-primary rounded-full px-10 py-4 text-lg"
+            >
+              Start Now
+            </Link>
+          </div>
         </div>
       </section>
     </div>

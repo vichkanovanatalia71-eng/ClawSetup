@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
+import { motion } from "framer-motion";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
@@ -75,7 +76,6 @@ export default function AIAssistant({ stepId }: AIAssistantProps) {
       };
       setMessages((prev) => [...prev, aiMsg]);
 
-      // Clear image after sending
       setImagePreview(null);
       setImageBase64(null);
       setImageMimeType(null);
@@ -111,47 +111,51 @@ export default function AIAssistant({ stepId }: AIAssistantProps) {
   }
 
   return (
-    <div className="w-80 flex-shrink-0 border-l border-gray-200 flex flex-col bg-white">
-      <div className="p-4 border-b border-gray-200">
-        <h3 className="font-semibold text-gray-900 text-sm">AI Assistant</h3>
-        <p className="text-xs text-gray-500 mt-1">
+    <div className="w-80 flex-shrink-0 flex flex-col bg-neu-bg m-2 rounded-2xl shadow-neu-sm">
+      <div className="p-4 border-b border-neu-dark/15">
+        <h3 className="font-semibold text-neu-text text-sm">AI Assistant</h3>
+        <p className="text-xs text-neu-muted mt-1">
           Ask about this step or upload a screenshot of an error
         </p>
       </div>
 
       {/* Quick actions */}
-      <div className="p-3 border-b border-gray-100 flex flex-wrap gap-1.5">
+      <div className="p-3 border-b border-neu-dark/10 flex flex-wrap gap-1.5">
         {quickActions.map((action) => (
-          <button
+          <motion.button
             key={action.id}
+            whileTap={{ scale: 0.95 }}
             onClick={() => sendMessage("", action.id)}
             disabled={loading}
-            className="px-2.5 py-1 bg-brand-50 text-brand-700 rounded-full text-xs font-medium hover:bg-brand-100 transition disabled:opacity-50"
+            className="px-3 py-1.5 rounded-full text-xs font-medium shadow-neu-xs text-brand-600 hover:shadow-neu-inset-sm transition-all duration-200 disabled:opacity-50"
           >
             {action.label}
-          </button>
+          </motion.button>
         ))}
       </div>
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.length === 0 && (
-          <div className="text-center text-gray-400 text-sm mt-8">
+          <div className="text-center text-neu-muted text-sm mt-8">
+            <div className="w-12 h-12 rounded-2xl shadow-neu-sm mx-auto mb-3 flex items-center justify-center">
+              <svg className="w-6 h-6 text-brand-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+              </svg>
+            </div>
             <p>Paste an error message or upload a screenshot to get help with this step.</p>
           </div>
         )}
         {messages.map((msg, i) => (
           <div
             key={i}
-            className={`${
-              msg.role === "user" ? "ml-4" : "mr-4"
-            }`}
+            className={msg.role === "user" ? "ml-4" : "mr-4"}
           >
             <div
-              className={`rounded-lg p-3 text-sm ${
+              className={`rounded-2xl p-3.5 text-sm ${
                 msg.role === "user"
-                  ? "bg-brand-50 text-brand-900"
-                  : "bg-gray-50 text-gray-800"
+                  ? "shadow-neu-sm bg-blue-50/50"
+                  : "shadow-neu-inset-sm"
               }`}
             >
               {msg.role === "assistant" ? (
@@ -161,14 +165,14 @@ export default function AIAssistant({ stepId }: AIAssistantProps) {
                   </ReactMarkdown>
                 </div>
               ) : (
-                <p>{msg.content}</p>
+                <p className="text-neu-text">{msg.content}</p>
               )}
             </div>
           </div>
         ))}
         {loading && (
-          <div className="flex items-center gap-2 text-gray-400 text-sm">
-            <div className="animate-spin w-4 h-4 border-2 border-gray-300 border-t-brand-500 rounded-full" />
+          <div className="flex items-center gap-2 text-neu-muted text-sm">
+            <div className="animate-spin w-4 h-4 border-2 border-neu-dark border-t-brand-500 rounded-full" />
             Analyzing...
           </div>
         )}
@@ -176,19 +180,19 @@ export default function AIAssistant({ stepId }: AIAssistantProps) {
 
       {/* Error */}
       {error && (
-        <div className="px-4 py-2 bg-red-50 text-red-600 text-xs">
+        <div className="px-4 py-2 text-red-500 text-xs rounded-xl shadow-neu-inset-sm mx-3 mb-2">
           {error}
         </div>
       )}
 
       {/* Image preview */}
       {imagePreview && (
-        <div className="px-4 py-2 border-t border-gray-100">
+        <div className="px-4 py-2 border-t border-neu-dark/10">
           <div className="relative inline-block">
             <img
               src={imagePreview}
               alt="Upload preview"
-              className="h-16 rounded border"
+              className="h-16 rounded-xl shadow-neu-xs"
             />
             <button
               onClick={() => {
@@ -196,7 +200,7 @@ export default function AIAssistant({ stepId }: AIAssistantProps) {
                 setImageBase64(null);
                 setImageMimeType(null);
               }}
-              className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white rounded-full text-xs flex items-center justify-center"
+              className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center shadow-sm"
             >
               x
             </button>
@@ -205,17 +209,18 @@ export default function AIAssistant({ stepId }: AIAssistantProps) {
       )}
 
       {/* Input */}
-      <div className="p-3 border-t border-gray-200">
-        <div className="flex gap-2">
-          <button
+      <div className="p-3 border-t border-neu-dark/15">
+        <div className="flex gap-2 items-center">
+          <motion.button
+            whileTap={{ scale: 0.9 }}
             onClick={() => fileInputRef.current?.click()}
-            className="p-2 text-gray-400 hover:text-gray-600 transition"
+            className="w-10 h-10 rounded-xl shadow-neu-xs flex items-center justify-center text-neu-muted hover:text-brand-500 transition-colors flex-shrink-0"
             title="Upload screenshot"
           >
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
-          </button>
+          </motion.button>
           <input
             ref={fileInputRef}
             type="file"
@@ -230,17 +235,18 @@ export default function AIAssistant({ stepId }: AIAssistantProps) {
             onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && sendMessage(input)}
             placeholder="Describe your error..."
             disabled={loading}
-            className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-1 focus:ring-brand-500 focus:border-brand-500 outline-none disabled:opacity-50"
+            className="neu-input flex-1 !py-2.5 text-sm disabled:opacity-50"
           />
-          <button
+          <motion.button
+            whileTap={{ scale: 0.9 }}
             onClick={() => sendMessage(input)}
             disabled={loading || (!input.trim() && !imageBase64)}
-            className="p-2 bg-brand-600 text-white rounded-lg hover:bg-brand-700 transition disabled:opacity-50"
+            className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-brand-600 text-white flex items-center justify-center shadow-neu-xs disabled:opacity-50 flex-shrink-0"
           >
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
             </svg>
-          </button>
+          </motion.button>
         </div>
       </div>
     </div>

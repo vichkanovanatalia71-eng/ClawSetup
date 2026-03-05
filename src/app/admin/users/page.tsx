@@ -15,46 +15,51 @@ export default async function UsersPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">Users</h1>
-      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+      <h1 className="text-2xl font-bold text-neu-text mb-6">Users</h1>
+      <div className="rounded-2xl shadow-neu bg-neu-bg overflow-hidden">
         <table className="w-full text-sm">
-          <thead className="bg-gray-50 border-b border-gray-200">
-            <tr>
-              <th className="text-left px-4 py-3 font-medium text-gray-500">Email</th>
-              <th className="text-left px-4 py-3 font-medium text-gray-500">Name</th>
-              <th className="text-left px-4 py-3 font-medium text-gray-500">Role</th>
-              <th className="text-left px-4 py-3 font-medium text-gray-500">Subscription</th>
-              <th className="text-left px-4 py-3 font-medium text-gray-500">Joined</th>
+          <thead>
+            <tr className="border-b border-neu-dark/15">
+              <th className="text-left px-5 py-4 font-medium text-neu-muted">Email</th>
+              <th className="text-left px-5 py-4 font-medium text-neu-muted">Name</th>
+              <th className="text-left px-5 py-4 font-medium text-neu-muted">Role</th>
+              <th className="text-left px-5 py-4 font-medium text-neu-muted">Subscription</th>
+              <th className="text-left px-5 py-4 font-medium text-neu-muted">Joined</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
-            {users.map((user) => (
-              <tr key={user.id} className="hover:bg-gray-50">
-                <td className="px-4 py-3">{user.email}</td>
-                <td className="px-4 py-3 text-gray-600">{user.name || "—"}</td>
-                <td className="px-4 py-3">
-                  <span className={`text-xs px-2 py-0.5 rounded ${
+          <tbody>
+            {users.map((user, i) => (
+              <tr
+                key={user.id}
+                className={`border-b border-neu-dark/10 last:border-0 ${
+                  i % 2 === 0 ? "" : "bg-white/20"
+                }`}
+              >
+                <td className="px-5 py-3.5 text-neu-text">{user.email}</td>
+                <td className="px-5 py-3.5 text-neu-muted">{user.name || "—"}</td>
+                <td className="px-5 py-3.5">
+                  <span className={`neu-pill text-xs font-medium ${
                     user.role === "SUPERADMIN" ? "bg-purple-100 text-purple-700" :
                     user.role === "ADMIN" ? "bg-blue-100 text-blue-700" :
                     user.role === "EDITOR" ? "bg-amber-100 text-amber-700" :
-                    "bg-gray-100 text-gray-600"
+                    "bg-gray-200 text-gray-600"
                   }`}>
                     {user.role}
                   </span>
                 </td>
-                <td className="px-4 py-3">
+                <td className="px-5 py-3.5">
                   {user.subscription ? (
-                    <span className={`text-xs px-2 py-0.5 rounded ${
+                    <span className={`neu-pill text-xs ${
                       user.subscription.status === "ACTIVE" ? "bg-green-100 text-green-700" :
-                      "bg-gray-100 text-gray-600"
+                      "bg-gray-200 text-gray-600"
                     }`}>
                       {user.subscription.status}
                     </span>
                   ) : (
-                    <span className="text-gray-400">—</span>
+                    <span className="text-neu-muted">—</span>
                   )}
                 </td>
-                <td className="px-4 py-3 text-gray-500">
+                <td className="px-5 py-3.5 text-neu-muted">
                   {new Date(user.createdAt).toLocaleDateString()}
                 </td>
               </tr>

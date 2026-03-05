@@ -12,7 +12,7 @@ export default function Watermark() {
   return (
     <div className="watermark-overlay" aria-hidden="true">
       {items.map((i) => (
-        <span key={i} className="whitespace-nowrap">
+        <span key={i} className="whitespace-nowrap text-neu-muted">
           {text}
         </span>
       ))}

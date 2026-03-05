@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { motion } from "framer-motion";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
@@ -27,14 +28,15 @@ export default function StepContent({
 }: StepContentProps) {
   return (
     <div className="protected-content no-select">
-      <div className="flex items-start justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">{title}</h1>
-        <button
+      <div className="flex items-start justify-between mb-6 gap-4">
+        <h1 className="text-2xl font-bold text-neu-text">{title}</h1>
+        <motion.button
+          whileTap={{ scale: 0.95 }}
           onClick={onToggleComplete}
-          className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition ${
+          className={`flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium transition-all duration-200 flex-shrink-0 ${
             completed
-              ? "bg-green-100 text-green-700 hover:bg-green-200"
-              : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+              ? "shadow-neu-inset-sm text-green-600"
+              : "shadow-neu-btn text-neu-muted hover:text-neu-text"
           }`}
         >
           {completed ? (
@@ -47,20 +49,20 @@ export default function StepContent({
           ) : (
             "Mark as Done"
           )}
-        </button>
+        </motion.button>
       </div>
 
       {goal && (
-        <div className="bg-blue-50 border border-blue-100 rounded-lg p-4 mb-6">
-          <h3 className="font-semibold text-blue-900 text-sm mb-1">Goal</h3>
-          <p className="text-blue-800 text-sm">{goal}</p>
+        <div className="rounded-2xl shadow-neu-sm p-5 mb-6 border-l-4 border-blue-400 bg-neu-bg">
+          <h3 className="font-semibold text-neu-text text-sm mb-1">Goal</h3>
+          <p className="text-neu-muted text-sm">{goal}</p>
         </div>
       )}
 
       {prerequisites && (
-        <div className="bg-amber-50 border border-amber-100 rounded-lg p-4 mb-6">
-          <h3 className="font-semibold text-amber-900 text-sm mb-1">Prerequisites</h3>
-          <p className="text-amber-800 text-sm">{prerequisites}</p>
+        <div className="rounded-2xl shadow-neu-sm p-5 mb-6 border-l-4 border-amber-400 bg-neu-bg">
+          <h3 className="font-semibold text-neu-text text-sm mb-1">Prerequisites</h3>
+          <p className="text-neu-muted text-sm">{prerequisites}</p>
         </div>
       )}
 
@@ -75,7 +77,7 @@ export default function StepContent({
               const isInline = !className;
               if (isInline) {
                 return (
-                  <code className="bg-gray-100 px-1.5 py-0.5 rounded text-sm font-mono">
+                  <code className="bg-neu-bg px-1.5 py-0.5 rounded-md text-sm font-mono shadow-neu-inset-sm">
                     {children}
                   </code>
                 );
@@ -89,16 +91,16 @@ export default function StepContent({
       </div>
 
       {expectedResult && (
-        <div className="bg-green-50 border border-green-100 rounded-lg p-4 mb-6">
-          <h3 className="font-semibold text-green-900 text-sm mb-1">Expected Result</h3>
-          <p className="text-green-800 text-sm whitespace-pre-wrap">{expectedResult}</p>
+        <div className="rounded-2xl shadow-neu-sm p-5 mb-6 border-l-4 border-green-400 bg-neu-bg">
+          <h3 className="font-semibold text-neu-text text-sm mb-1">Expected Result</h3>
+          <p className="text-neu-muted text-sm whitespace-pre-wrap">{expectedResult}</p>
         </div>
       )}
 
       {commonErrors && (
-        <div className="bg-red-50 border border-red-100 rounded-lg p-4 mb-6">
-          <h3 className="font-semibold text-red-900 text-sm mb-1">Common Errors</h3>
-          <div className="text-red-800 text-sm whitespace-pre-wrap">{commonErrors}</div>
+        <div className="rounded-2xl shadow-neu-sm p-5 mb-6 border-l-4 border-red-400 bg-neu-bg">
+          <h3 className="font-semibold text-neu-text text-sm mb-1">Common Errors</h3>
+          <div className="text-neu-muted text-sm whitespace-pre-wrap">{commonErrors}</div>
         </div>
       )}
 
@@ -125,15 +127,16 @@ function CodeBlock({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="relative group">
-      <pre className="bg-gray-900 text-gray-100 rounded-lg overflow-x-auto">
+      <pre className="rounded-xl shadow-neu-inset bg-gray-900 text-gray-100 overflow-x-auto">
         {children}
       </pre>
-      <button
+      <motion.button
+        whileTap={{ scale: 0.9 }}
         onClick={handleCopy}
-        className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition bg-gray-700 text-gray-200 px-2 py-1 rounded text-xs hover:bg-gray-600"
+        className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg shadow-neu-xs bg-gray-700 text-gray-200 px-3 py-1.5 text-xs hover:bg-gray-600"
       >
         {copied ? "Copied!" : "Copy"}
-      </button>
+      </motion.button>
     </div>
   );
 }

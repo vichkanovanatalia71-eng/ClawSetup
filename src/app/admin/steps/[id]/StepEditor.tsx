@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
 
 interface StepData {
   id: string;
@@ -58,84 +59,84 @@ export default function StepEditor({ step }: { step: StepData }) {
       {/* Title & Slug */}
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
+          <label className="block text-sm font-medium text-neu-muted mb-2">Title</label>
           <input
             value={form.title}
             onChange={(e) => update("title", e.target.value)}
-            className="w-full px-3 py-2 border rounded-lg text-sm"
+            className="neu-input w-full"
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Slug</label>
+          <label className="block text-sm font-medium text-neu-muted mb-2">Slug</label>
           <input
             value={form.slug}
             onChange={(e) => update("slug", e.target.value)}
-            className="w-full px-3 py-2 border rounded-lg text-sm"
+            className="neu-input w-full"
           />
         </div>
       </div>
 
       {/* Goal */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Goal</label>
+        <label className="block text-sm font-medium text-neu-muted mb-2">Goal</label>
         <textarea
           value={form.goal}
           onChange={(e) => update("goal", e.target.value)}
           rows={2}
-          className="w-full px-3 py-2 border rounded-lg text-sm"
+          className="neu-input w-full"
         />
       </div>
 
       {/* Prerequisites */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Prerequisites</label>
+        <label className="block text-sm font-medium text-neu-muted mb-2">Prerequisites</label>
         <textarea
           value={form.prerequisites}
           onChange={(e) => update("prerequisites", e.target.value)}
           rows={2}
-          className="w-full px-3 py-2 border rounded-lg text-sm"
+          className="neu-input w-full"
         />
       </div>
 
       {/* Content (markdown) */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label className="block text-sm font-medium text-neu-muted mb-2">
           Content (Markdown)
         </label>
         <textarea
           value={form.contentMd}
           onChange={(e) => update("contentMd", e.target.value)}
           rows={20}
-          className="w-full px-3 py-2 border rounded-lg text-sm font-mono"
+          className="neu-input w-full font-mono"
           placeholder="Step content in markdown..."
         />
       </div>
 
       {/* Expected Result */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Expected Result</label>
+        <label className="block text-sm font-medium text-neu-muted mb-2">Expected Result</label>
         <textarea
           value={form.expectedResult}
           onChange={(e) => update("expectedResult", e.target.value)}
           rows={3}
-          className="w-full px-3 py-2 border rounded-lg text-sm"
+          className="neu-input w-full"
         />
       </div>
 
       {/* Common Errors */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Common Errors</label>
+        <label className="block text-sm font-medium text-neu-muted mb-2">Common Errors</label>
         <textarea
           value={form.commonErrors}
           onChange={(e) => update("commonErrors", e.target.value)}
           rows={5}
-          className="w-full px-3 py-2 border rounded-lg text-sm"
+          className="neu-input w-full"
         />
       </div>
 
       {/* Tags */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label className="block text-sm font-medium text-neu-muted mb-2">
           Tags (comma-separated)
         </label>
         <input
@@ -146,32 +147,42 @@ export default function StepEditor({ step }: { step: StepData }) {
               e.target.value.split(",").map((t) => t.trim()).filter(Boolean)
             )
           }
-          className="w-full px-3 py-2 border rounded-lg text-sm"
+          className="neu-input w-full"
           placeholder="remote, ubuntu, gcloud"
         />
       </div>
 
       {/* Actions */}
-      <div className="flex items-center gap-4 pt-4 border-t">
-        <button
+      <div className="flex items-center gap-4 pt-4 border-t border-neu-dark/15">
+        <motion.button
+          whileTap={{ scale: 0.97 }}
           onClick={handleSave}
           disabled={saving}
-          className="bg-brand-600 text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-brand-700 disabled:opacity-50"
+          className="neu-btn-primary rounded-full px-6 py-2.5 text-sm disabled:opacity-50"
         >
           {saving ? "Saving..." : "Save Changes"}
-        </button>
-        <button
+        </motion.button>
+        <motion.button
+          whileTap={{ scale: 0.97 }}
           onClick={togglePublish}
           disabled={saving}
-          className={`px-6 py-2 rounded-lg text-sm font-medium border ${
+          className={`rounded-full px-6 py-2.5 text-sm font-medium shadow-neu-btn transition-all duration-200 ${
             form.status === "PUBLISHED"
-              ? "border-amber-300 text-amber-700 hover:bg-amber-50"
-              : "border-green-300 text-green-700 hover:bg-green-50"
+              ? "text-amber-600"
+              : "text-green-600"
           }`}
         >
           {form.status === "PUBLISHED" ? "Unpublish" : "Publish"}
-        </button>
-        {saved && <span className="text-green-600 text-sm">Saved!</span>}
+        </motion.button>
+        {saved && (
+          <motion.span
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="neu-pill bg-green-100 text-green-600 text-sm"
+          >
+            Saved!
+          </motion.span>
+        )}
       </div>
     </div>
   );

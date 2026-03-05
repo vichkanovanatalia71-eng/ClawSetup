@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import StepNavigation from "@/components/instruction/StepNavigation";
 import StepContent from "@/components/instruction/StepContent";
 import AIAssistant from "@/components/instruction/AIAssistant";
@@ -65,7 +66,7 @@ export default function StepPageClient({
   }
 
   return (
-    <div className="flex h-[calc(100vh-64px)]" onContextMenu={(e) => e.preventDefault()}>
+    <div className="flex h-[calc(100vh-64px)] bg-neu-bg" onContextMenu={(e) => e.preventDefault()}>
       <Watermark />
 
       {/* Left: Navigation */}
@@ -102,31 +103,44 @@ export default function StepPageClient({
       </div>
 
       {/* Mobile AI toggle */}
-      <button
+      <motion.button
+        whileTap={{ scale: 0.9 }}
         onClick={() => setShowAI(!showAI)}
-        className="xl:hidden fixed bottom-6 right-6 w-14 h-14 bg-brand-600 text-white rounded-full shadow-lg flex items-center justify-center hover:bg-brand-700 transition z-40"
+        className="xl:hidden fixed bottom-6 right-6 w-14 h-14 bg-gradient-to-br from-blue-500 to-brand-600 text-white rounded-full shadow-neu flex items-center justify-center z-40"
       >
         <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
         </svg>
-      </button>
+      </motion.button>
 
       {/* Mobile AI panel */}
-      {showAI && (
-        <div className="xl:hidden fixed inset-0 z-50 bg-white">
-          <div className="flex justify-between items-center p-4 border-b">
-            <h3 className="font-semibold">AI Assistant</h3>
-            <button onClick={() => setShowAI(false)} className="text-gray-500">
-              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
-          <div className="h-[calc(100vh-64px)]">
-            <AIAssistant stepId={step.id} />
-          </div>
-        </div>
-      )}
+      <AnimatePresence>
+        {showAI && (
+          <motion.div
+            initial={{ x: "100%" }}
+            animate={{ x: 0 }}
+            exit={{ x: "100%" }}
+            transition={{ type: "spring", damping: 25, stiffness: 200 }}
+            className="xl:hidden fixed inset-0 z-50 bg-neu-bg"
+          >
+            <div className="flex justify-between items-center p-4 shadow-neu-sm mx-4 mt-4 rounded-2xl bg-neu-bg">
+              <h3 className="font-semibold text-neu-text">AI Assistant</h3>
+              <motion.button
+                whileTap={{ scale: 0.9 }}
+                onClick={() => setShowAI(false)}
+                className="w-8 h-8 rounded-xl shadow-neu-xs flex items-center justify-center text-neu-muted"
+              >
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </motion.button>
+            </div>
+            <div className="h-[calc(100vh-80px)]">
+              <AIAssistant stepId={step.id} />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

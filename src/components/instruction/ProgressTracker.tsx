@@ -9,20 +9,19 @@ export default function ProgressTracker({ totalSteps, completedSteps }: Progress
   const percentage = totalSteps > 0 ? Math.round((completedSteps / totalSteps) * 100) : 0;
 
   return (
-    <div className="bg-white border border-gray-200 rounded-lg p-4">
-      <div className="flex items-center justify-between mb-2">
-        <span className="text-sm font-medium text-gray-700">Progress</span>
-        <span className="text-sm text-gray-500">
-          {completedSteps}/{totalSteps} steps
+    <div className="rounded-2xl shadow-neu-sm p-5 bg-neu-bg">
+      <div className="flex items-center justify-between mb-3">
+        <span className="text-sm font-medium text-neu-text">Progress</span>
+        <span className="text-sm text-neu-muted">
+          {completedSteps}/{totalSteps} steps — {percentage}%
         </span>
       </div>
-      <div className="w-full bg-gray-200 rounded-full h-2.5">
+      <div className="neu-progress-track">
         <div
-          className="bg-brand-600 h-2.5 rounded-full transition-all duration-300"
+          className="neu-progress-fill"
           style={{ width: `${percentage}%` }}
         />
       </div>
-      <p className="text-xs text-gray-500 mt-1">{percentage}% complete</p>
     </div>
   );
 }

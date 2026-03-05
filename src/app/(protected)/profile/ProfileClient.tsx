@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { motion } from "framer-motion";
 
 export default function ProfileClient({ hasSubscription }: { hasSubscription: boolean }) {
   const [loading, setLoading] = useState(false);
@@ -35,23 +36,25 @@ export default function ProfileClient({ hasSubscription }: { hasSubscription: bo
 
   if (hasSubscription) {
     return (
-      <button
+      <motion.button
+        whileTap={{ scale: 0.97 }}
         onClick={handleManageSubscription}
         disabled={loading}
-        className="mt-2 text-brand-600 hover:text-brand-700 text-sm font-medium disabled:opacity-50"
+        className="mt-2 neu-btn rounded-full px-5 py-2 text-sm font-medium text-brand-600 disabled:opacity-50"
       >
         {loading ? "Loading..." : "Manage Subscription"}
-      </button>
+      </motion.button>
     );
   }
 
   return (
-    <button
+    <motion.button
+      whileTap={{ scale: 0.97 }}
       onClick={handleSubscribe}
       disabled={loading}
-      className="bg-brand-600 text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-brand-700 transition disabled:opacity-50"
+      className="neu-btn-primary rounded-full px-6 py-2.5 text-sm disabled:opacity-50"
     >
       {loading ? "Loading..." : "Subscribe — $29/month"}
-    </button>
+    </motion.button>
   );
 }

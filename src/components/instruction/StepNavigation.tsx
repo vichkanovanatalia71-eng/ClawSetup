@@ -28,11 +28,11 @@ export default function StepNavigation({ scenarioSlug, modules }: StepNavigation
   const currentStepSlug = params?.stepSlug as string;
 
   return (
-    <nav className="w-64 flex-shrink-0 border-r border-gray-200 overflow-y-auto bg-gray-50 p-4">
+    <nav className="w-64 flex-shrink-0 overflow-y-auto bg-neu-bg p-4 m-2 rounded-2xl shadow-neu-sm">
       <div className="space-y-6">
         {modules.map((mod) => (
           <div key={mod.id}>
-            <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
+            <h3 className="text-xs font-semibold text-neu-muted uppercase tracking-wider mb-2 px-3">
               {mod.title}
             </h3>
             <ul className="space-y-1">
@@ -42,19 +42,19 @@ export default function StepNavigation({ scenarioSlug, modules }: StepNavigation
                   <li key={step.id}>
                     <Link
                       href={`/instruction/${scenarioSlug}/${step.slug}`}
-                      className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition ${
+                      className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm transition-all duration-200 ${
                         isActive
-                          ? "bg-brand-100 text-brand-700 font-medium"
-                          : "text-gray-600 hover:bg-gray-100"
+                          ? "shadow-neu-inset-sm text-brand-600 font-medium"
+                          : "text-neu-muted hover:shadow-neu-flat hover:text-neu-text"
                       }`}
                     >
                       <span
-                        className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 text-xs ${
+                        className={`w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0 text-xs transition-all duration-200 ${
                           step.completed
-                            ? "bg-green-500 text-white"
+                            ? "bg-green-500 text-white shadow-sm"
                             : isActive
-                            ? "bg-brand-500 text-white"
-                            : "bg-gray-200 text-gray-500"
+                            ? "bg-gradient-to-br from-blue-500 to-brand-600 text-white shadow-sm"
+                            : "shadow-neu-xs text-neu-muted"
                         }`}
                       >
                         {step.completed ? (
