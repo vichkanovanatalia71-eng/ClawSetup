@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 
 export default function FeedbackWidget({ stepId }: { stepId: string }) {
-  const [_feedback, setFeedback] = useState<boolean | null>(null);
   const [submitted, setSubmitted] = useState(false);
 
   useEffect(() => {
@@ -13,7 +12,6 @@ export default function FeedbackWidget({ stepId }: { stepId: string }) {
       .then((r) => r.json())
       .then((data) => {
         if (!cancelled && data.helpful !== null) {
-          setFeedback(data.helpful);
           setSubmitted(true);
         }
       })
@@ -22,7 +20,6 @@ export default function FeedbackWidget({ stepId }: { stepId: string }) {
   }, [stepId]);
 
   async function submit(helpful: boolean) {
-    setFeedback(helpful);
     setSubmitted(true);
     await fetch("/api/feedback", {
       method: "POST",
