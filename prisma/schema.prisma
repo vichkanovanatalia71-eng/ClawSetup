@@ -135,42 +135,52 @@ model Payment {
 }
 
 model Scenario {
-  id          String   @id @default(cuid())
-  slug        String   @unique
-  name        String
-  description String?  @db.Text
-  order       Int      @default(0)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id            String   @id @default(cuid())
+  slug          String   @unique
+  name          String
+  nameUk        String?
+  description   String?  @db.Text
+  descriptionUk String?  @db.Text
+  order         Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   modules      Module[]
   certificates Certificate[]
 }
 
 model Module {
-  id          String   @id @default(cuid())
-  scenarioId  String
-  title       String
-  description String?  @db.Text
-  order       Int      @default(0)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id            String   @id @default(cuid())
+  scenarioId    String
+  title         String
+  titleUk       String?
+  description   String?  @db.Text
+  descriptionUk String?  @db.Text
+  order         Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   scenario Scenario @relation(fields: [scenarioId], references: [id], onDelete: Cascade)
   steps    Step[]
 }
 
 model Step {
-  id              String     @id @default(cuid())
-  moduleId        String
-  title           String
-  slug            String
-  goal            String?    @db.Text
-  prerequisites   String?    @db.Text
-  contentMd       String     @db.Text
-  expectedResult  String?    @db.Text
-  commonErrors    String?    @db.Text
-  order           Int        @default(0)
+  id                String     @id @default(cuid())
+  moduleId          String
+  title             String
+  titleUk           String?
+  slug              String
+  goal              String?    @db.Text
+  goalUk            String?    @db.Text
+  prerequisites     String?    @db.Text
+  prerequisitesUk   String?    @db.Text
+  contentMd         String     @db.Text
+  contentMdUk       String?    @db.Text
+  expectedResult    String?    @db.Text
+  expectedResultUk  String?    @db.Text
+  commonErrors      String?    @db.Text
+  commonErrorsUk    String?    @db.Text
+  order             Int        @default(0)
   version         Int        @default(1)
   status          StepStatus @default(DRAFT)
   difficulty      Difficulty @default(BEGINNER)

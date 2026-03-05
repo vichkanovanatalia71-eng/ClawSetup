@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { Metadata } from "next";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { getLocale, localized } from "@/lib/localized-content";
 import StepPageClient from "./StepPageClient";
 import JsonLd from "@/components/seo/JsonLd";
 
@@ -18,12 +19,16 @@ export async function generateMetadata({
       slug: params.stepSlug,
       module: { scenario: { slug: params.scenarioSlug } },
     },
-    select: { title: true, goal: true },
+    select: { title: true, titleUk: true, goal: true, goalUk: true },
   });
 
+  const locale = await getLocale();
+  const title = step ? localized(step, "title", locale) : "Step";
+  const goal = step ? localized(step, "goal", locale) : "";
+
   return {
-    title: step ? `${step.title} — ClawSetup` : "Step — ClawSetup",
-    description: step?.goal || "Interactive OpenClaw setup guide step",
+    title: `${title} — ClawSetup`,
+    description: goal || "Interactive OpenClaw setup guide step",
   };
 }
 
@@ -34,6 +39,8 @@ export default async function StepPage({
 }) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) redirect("/login");
+
+  const locale = await getLocale();
 
   const subscription = await prisma.subscription.findUnique({
     where: { userId: session.user.id },
@@ -55,11 +62,17 @@ export default async function StepPage({
               id: true,
               slug: true,
               title: true,
+              titleUk: true,
               goal: true,
+              goalUk: true,
               prerequisites: true,
+              prerequisitesUk: true,
               contentMd: true,
+              contentMdUk: true,
               expectedResult: true,
+              expectedResultUk: true,
               commonErrors: true,
+              commonErrorsUk: true,
               order: true,
               media: {
                 where: { type: "video" },
@@ -80,7 +93,7 @@ export default async function StepPage({
   for (const mod of scenario.modules) {
     const found = mod.steps.find((s) => s.slug === params.stepSlug);
     if (found) {
-      currentStep = { ...found, moduleId: mod.id, moduleTitle: mod.title };
+      currentStep = { ...found, moduleId: mod.id, moduleTitle: localized(mod, "title", locale) };
       break;
     }
   }
@@ -109,12 +122,12 @@ export default async function StepPage({
 
   const navModules = scenario.modules.map((mod) => ({
     id: mod.id,
-    title: mod.title,
+    title: localized(mod, "title", locale),
     order: mod.order,
     steps: mod.steps.map((s) => ({
       id: s.id,
       slug: s.slug,
-      title: s.title,
+      title: localized(s, "title", locale),
       order: s.order,
       completed: progressMap[s.id] || false,
     })),
@@ -126,11 +139,12 @@ export default async function StepPage({
     0
   );
 
+  const stepTitle = localized(currentStep, "title", locale);
   const stepJsonLd = {
     "@context": "https://schema.org",
     "@type": "HowToStep",
-    name: currentStep.title,
-    text: currentStep.goal || currentStep.contentMd.slice(0, 200),
+    name: stepTitle,
+    text: localized(currentStep, "goal", locale) || localized(currentStep, "contentMd", locale).slice(0, 200),
     position: currentStep.order,
   };
 
@@ -139,17 +153,17 @@ export default async function StepPage({
     <JsonLd data={stepJsonLd} />
     <StepPageClient
       scenarioSlug={params.scenarioSlug}
-      scenarioName={scenario.name}
+      scenarioName={localized(scenario, "name", locale)}
       moduleTitle={currentStep.moduleTitle}
       step={{
         id: currentStep.id,
         moduleId: currentStep.moduleId,
-        title: currentStep.title,
-        goal: currentStep.goal,
-        prerequisites: currentStep.prerequisites,
-        contentMd: currentStep.contentMd,
-        expectedResult: currentStep.expectedResult,
-        commonErrors: currentStep.commonErrors,
+        title: stepTitle,
+        goal: localized(currentStep, "goal", locale) || null,
+        prerequisites: localized(currentStep, "prerequisites", locale) || null,
+        contentMd: localized(currentStep, "contentMd", locale),
+        expectedResult: localized(currentStep, "expectedResult", locale) || null,
+        commonErrors: localized(currentStep, "commonErrors", locale) || null,
         completed: progressMap[currentStep.id] || false,
         videoUrl: currentStep.media?.[0]?.url || null,
       }}

@@ -26,8 +26,10 @@ export async function GET() {
 
 const scenarioSchema = z.object({
   name: z.string().min(1).max(200),
+  nameUk: z.string().max(200).optional(),
   slug: z.string().min(1).max(100).regex(/^[a-z0-9-]+$/, "Slug must be lowercase with hyphens"),
   description: z.string().max(1000).optional(),
+  descriptionUk: z.string().max(1000).optional(),
 });
 
 export async function POST(req: NextRequest) {
@@ -60,8 +62,10 @@ export async function POST(req: NextRequest) {
 const updateSchema = z.object({
   id: z.string().min(1),
   name: z.string().min(1).max(200).optional(),
+  nameUk: z.string().max(200).optional(),
   slug: z.string().min(1).max(100).regex(/^[a-z0-9-]+$/).optional(),
   description: z.string().max(1000).optional(),
+  descriptionUk: z.string().max(1000).optional(),
   order: z.number().int().min(0).optional(),
 });
 

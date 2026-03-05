@@ -41,18 +41,24 @@ export async function PUT(req: NextRequest) {
   if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   const body = await req.json();
-  const { id, title, slug, goal, prerequisites, contentMd, expectedResult, commonErrors, status, tags, videoUrl } = body;
+  const { id, title, titleUk, slug, goal, goalUk, prerequisites, prerequisitesUk, contentMd, contentMdUk, expectedResult, expectedResultUk, commonErrors, commonErrorsUk, status, tags, videoUrl } = body;
 
   const step = await prisma.step.update({
     where: { id },
     data: {
       title,
+      titleUk: titleUk || null,
       slug,
       goal: goal || null,
+      goalUk: goalUk || null,
       prerequisites: prerequisites || null,
+      prerequisitesUk: prerequisitesUk || null,
       contentMd,
+      contentMdUk: contentMdUk || null,
       expectedResult: expectedResult || null,
+      expectedResultUk: expectedResultUk || null,
       commonErrors: commonErrors || null,
+      commonErrorsUk: commonErrorsUk || null,
       status: status || undefined,
       tags: tags || [],
       version: { increment: 1 },

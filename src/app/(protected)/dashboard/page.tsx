@@ -4,11 +4,14 @@ import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { getLocale, localized } from "@/lib/localized-content";
 
 export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
   const t = await getTranslations("dashboard");
+  const tc = await getTranslations("common");
+  const locale = await getLocale();
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) redirect("/login");
 
@@ -25,7 +28,7 @@ export default async function DashboardPage() {
           steps: {
             where: { status: "PUBLISHED" },
             orderBy: { order: "asc" },
-            select: { id: true, slug: true, title: true },
+            select: { id: true, slug: true, title: true, titleUk: true },
           },
         },
       },
@@ -118,7 +121,7 @@ export default async function DashboardPage() {
           for (const mod of scenario.modules) {
             for (const s of mod.steps) {
               if (!completedIds.has(s.id)) {
-                nextStep = { slug: s.slug, title: s.title };
+                nextStep = { slug: s.slug, title: localized(s, "title", locale) };
                 break;
               }
             }
@@ -127,7 +130,7 @@ export default async function DashboardPage() {
           // If all complete, link to the first step
           if (!nextStep && scenario.modules[0]?.steps[0]) {
             const first = scenario.modules[0].steps[0];
-            nextStep = { slug: first.slug, title: first.title };
+            nextStep = { slug: first.slug, title: localized(first, "title", locale) };
           }
 
           return (
@@ -136,11 +139,11 @@ export default async function DashboardPage() {
               className="rounded-2xl shadow-neu p-6 bg-neu-bg hover:shadow-neu-sm transition-all duration-200"
             >
               <h3 className="text-lg font-semibold text-neu-text mb-2">
-                {scenario.name}
+                {localized(scenario, "name", locale)}
               </h3>
-              {scenario.description && (
+              {(scenario.description || scenario.descriptionUk) && (
                 <p className="text-neu-muted text-sm mb-4">
-                  {scenario.description}
+                  {localized(scenario, "description", locale)}
                 </p>
               )}
               <div className="mb-4">
@@ -167,7 +170,7 @@ export default async function DashboardPage() {
                   </Link>
                   {completedSteps > 0 && nextStep && percentage < 100 && (
                     <p className="text-xs text-neu-muted mt-2">
-                      Resume: {nextStep.title}
+                      {tc("resume")}: {nextStep.title}
                     </p>
                   )}
                 </div>

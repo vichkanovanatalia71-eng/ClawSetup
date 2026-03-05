@@ -3,22 +3,30 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
+import { useTranslations } from "next-intl";
 
 interface StepData {
   id: string;
   title: string;
+  titleUk: string;
   slug: string;
   goal: string;
+  goalUk: string;
   prerequisites: string;
+  prerequisitesUk: string;
   contentMd: string;
+  contentMdUk: string;
   expectedResult: string;
+  expectedResultUk: string;
   commonErrors: string;
+  commonErrorsUk: string;
   status: string;
   tags: string[];
   videoUrl: string;
 }
 
 export default function StepEditor({ step }: { step: StepData }) {
+  const t = useTranslations("admin");
   const [form, setForm] = useState(step);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -60,7 +68,7 @@ export default function StepEditor({ step }: { step: StepData }) {
       {/* Title & Slug */}
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium text-neu-muted mb-2">Title</label>
+          <label className="block text-sm font-medium text-neu-muted mb-2">{t("title")}</label>
           <input
             value={form.title}
             onChange={(e) => update("title", e.target.value)}
@@ -68,78 +76,138 @@ export default function StepEditor({ step }: { step: StepData }) {
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-neu-muted mb-2">Slug</label>
+          <label className="block text-sm font-medium text-neu-muted mb-2">{t("titleUk")}</label>
           <input
-            value={form.slug}
-            onChange={(e) => update("slug", e.target.value)}
+            value={form.titleUk}
+            onChange={(e) => update("titleUk", e.target.value)}
             className="neu-input w-full"
           />
         </div>
       </div>
 
-      {/* Goal */}
       <div>
-        <label className="block text-sm font-medium text-neu-muted mb-2">Goal</label>
-        <textarea
-          value={form.goal}
-          onChange={(e) => update("goal", e.target.value)}
-          rows={2}
+        <label className="block text-sm font-medium text-neu-muted mb-2">{t("slug")}</label>
+        <input
+          value={form.slug}
+          onChange={(e) => update("slug", e.target.value)}
           className="neu-input w-full"
         />
       </div>
 
+      {/* Goal */}
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm font-medium text-neu-muted mb-2">{t("goal")}</label>
+          <textarea
+            value={form.goal}
+            onChange={(e) => update("goal", e.target.value)}
+            rows={2}
+            className="neu-input w-full"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-neu-muted mb-2">{t("goalUk")}</label>
+          <textarea
+            value={form.goalUk}
+            onChange={(e) => update("goalUk", e.target.value)}
+            rows={2}
+            className="neu-input w-full"
+          />
+        </div>
+      </div>
+
       {/* Prerequisites */}
-      <div>
-        <label className="block text-sm font-medium text-neu-muted mb-2">Prerequisites</label>
-        <textarea
-          value={form.prerequisites}
-          onChange={(e) => update("prerequisites", e.target.value)}
-          rows={2}
-          className="neu-input w-full"
-        />
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm font-medium text-neu-muted mb-2">{t("prerequisites")}</label>
+          <textarea
+            value={form.prerequisites}
+            onChange={(e) => update("prerequisites", e.target.value)}
+            rows={2}
+            className="neu-input w-full"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-neu-muted mb-2">{t("prerequisitesUk")}</label>
+          <textarea
+            value={form.prerequisitesUk}
+            onChange={(e) => update("prerequisitesUk", e.target.value)}
+            rows={2}
+            className="neu-input w-full"
+          />
+        </div>
       </div>
 
       {/* Content (markdown) */}
       <div>
-        <label className="block text-sm font-medium text-neu-muted mb-2">
-          Content (Markdown)
-        </label>
+        <label className="block text-sm font-medium text-neu-muted mb-2">{t("contentMd")}</label>
         <textarea
           value={form.contentMd}
           onChange={(e) => update("contentMd", e.target.value)}
           rows={20}
           className="neu-input w-full font-mono"
-          placeholder="Step content in markdown..."
+          placeholder={t("stepContentPlaceholder")}
+        />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-neu-muted mb-2">{t("contentMdUk")}</label>
+        <textarea
+          value={form.contentMdUk}
+          onChange={(e) => update("contentMdUk", e.target.value)}
+          rows={20}
+          className="neu-input w-full font-mono"
+          placeholder={t("stepContentUkPlaceholder")}
         />
       </div>
 
       {/* Expected Result */}
-      <div>
-        <label className="block text-sm font-medium text-neu-muted mb-2">Expected Result</label>
-        <textarea
-          value={form.expectedResult}
-          onChange={(e) => update("expectedResult", e.target.value)}
-          rows={3}
-          className="neu-input w-full"
-        />
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm font-medium text-neu-muted mb-2">{t("expectedResult")}</label>
+          <textarea
+            value={form.expectedResult}
+            onChange={(e) => update("expectedResult", e.target.value)}
+            rows={3}
+            className="neu-input w-full"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-neu-muted mb-2">{t("expectedResultUk")}</label>
+          <textarea
+            value={form.expectedResultUk}
+            onChange={(e) => update("expectedResultUk", e.target.value)}
+            rows={3}
+            className="neu-input w-full"
+          />
+        </div>
       </div>
 
       {/* Common Errors */}
-      <div>
-        <label className="block text-sm font-medium text-neu-muted mb-2">Common Errors</label>
-        <textarea
-          value={form.commonErrors}
-          onChange={(e) => update("commonErrors", e.target.value)}
-          rows={5}
-          className="neu-input w-full"
-        />
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm font-medium text-neu-muted mb-2">{t("commonErrors")}</label>
+          <textarea
+            value={form.commonErrors}
+            onChange={(e) => update("commonErrors", e.target.value)}
+            rows={5}
+            className="neu-input w-full"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-neu-muted mb-2">{t("commonErrorsUk")}</label>
+          <textarea
+            value={form.commonErrorsUk}
+            onChange={(e) => update("commonErrorsUk", e.target.value)}
+            rows={5}
+            className="neu-input w-full"
+          />
+        </div>
       </div>
 
       {/* Video URL */}
       <div>
-        <label className="block text-sm font-medium text-neu-muted mb-2">
-          Video URL (YouTube, Loom, or direct)
-        </label>
+        <label className="block text-sm font-medium text-neu-muted mb-2">{t("videoUrl")}</label>
         <input
           value={form.videoUrl}
           onChange={(e) => update("videoUrl", e.target.value)}
@@ -150,9 +218,7 @@ export default function StepEditor({ step }: { step: StepData }) {
 
       {/* Tags */}
       <div>
-        <label className="block text-sm font-medium text-neu-muted mb-2">
-          Tags (comma-separated)
-        </label>
+        <label className="block text-sm font-medium text-neu-muted mb-2">{t("tags")}</label>
         <input
           value={form.tags.join(", ")}
           onChange={(e) =>
@@ -174,7 +240,7 @@ export default function StepEditor({ step }: { step: StepData }) {
           disabled={saving}
           className="neu-btn-primary rounded-full px-6 py-2.5 text-sm disabled:opacity-50"
         >
-          {saving ? "Saving..." : "Save Changes"}
+          {saving ? t("saving") : t("saveChanges")}
         </motion.button>
         <motion.button
           whileTap={{ scale: 0.97 }}
@@ -186,7 +252,7 @@ export default function StepEditor({ step }: { step: StepData }) {
               : "text-green-600"
           }`}
         >
-          {form.status === "PUBLISHED" ? "Unpublish" : "Publish"}
+          {form.status === "PUBLISHED" ? t("unpublish") : t("publish")}
         </motion.button>
         {saved && (
           <motion.span
@@ -194,7 +260,7 @@ export default function StepEditor({ step }: { step: StepData }) {
             animate={{ opacity: 1, x: 0 }}
             className="neu-pill bg-green-100 text-green-600 text-sm"
           >
-            Saved!
+            {t("saved")}
           </motion.span>
         )}
       </div>

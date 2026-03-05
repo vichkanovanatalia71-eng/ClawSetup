@@ -1,10 +1,13 @@
 import { prisma } from "@/lib/prisma";
+import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 import ScenarioActions from "./ScenarioActions";
 
 export const dynamic = "force-dynamic";
 
 export default async function ScenariosPage() {
+  const t = await getTranslations("admin");
+
   const scenarios = await prisma.scenario.findMany({
     orderBy: { order: "asc" },
     include: {
@@ -13,7 +16,7 @@ export default async function ScenariosPage() {
         include: {
           steps: {
             orderBy: { order: "asc" },
-            select: { id: true, title: true, status: true, order: true, slug: true },
+            select: { id: true, title: true, titleUk: true, status: true, order: true, slug: true },
           },
         },
       },
@@ -23,7 +26,7 @@ export default async function ScenariosPage() {
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-neu-text">Scenarios & Content</h1>
+        <h1 className="text-2xl font-bold text-neu-text">{t("scenariosAndContent")}</h1>
         <ScenarioActions />
       </div>
 
@@ -32,9 +35,15 @@ export default async function ScenariosPage() {
           <div className="flex justify-between items-start mb-4">
             <div>
               <h2 className="text-lg font-semibold text-neu-text">{scenario.name}</h2>
-              <p className="text-sm text-neu-muted">Slug: {scenario.slug}</p>
+              {scenario.nameUk && (
+                <p className="text-sm text-brand-600">{scenario.nameUk}</p>
+              )}
+              <p className="text-sm text-neu-muted">{t("slug")}: {scenario.slug}</p>
               {scenario.description && (
                 <p className="text-sm text-neu-muted mt-1">{scenario.description}</p>
+              )}
+              {scenario.descriptionUk && (
+                <p className="text-sm text-neu-muted mt-0.5 italic">{scenario.descriptionUk}</p>
               )}
             </div>
           </div>
@@ -43,6 +52,7 @@ export default async function ScenariosPage() {
             <div key={mod.id} className="ml-4 mb-4">
               <h3 className="font-medium text-neu-text text-sm mb-2 px-3 py-1.5 rounded-lg shadow-neu-flat inline-block">
                 {mod.title}
+                {mod.titleUk && <span className="text-brand-600 ml-2">/ {mod.titleUk}</span>}
               </h3>
               <div className="space-y-1 ml-4 mt-2">
                 {mod.steps.map((step) => (
@@ -57,6 +67,7 @@ export default async function ScenariosPage() {
                         className="text-sm text-brand-600 hover:text-brand-700 font-medium"
                       >
                         {step.title}
+                        {step.titleUk && <span className="text-neu-muted font-normal ml-2">/ {step.titleUk}</span>}
                       </Link>
                     </div>
                     <span
@@ -78,7 +89,7 @@ export default async function ScenariosPage() {
 
       {scenarios.length === 0 && (
         <div className="text-center py-12 text-neu-muted">
-          <p>No scenarios yet. Create one to get started.</p>
+          <p>{t("noScenarios")}</p>
         </div>
       )}
     </div>
