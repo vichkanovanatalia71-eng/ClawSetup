@@ -1,8 +1,11 @@
 import { prisma } from "@/lib/prisma";
+import { getTranslations } from "next-intl/server";
 
 export const dynamic = "force-dynamic";
 
 export default async function CohortsPage() {
+  const t = await getTranslations("admin");
+
   // Limit to last 12 months of registrations to prevent OOM
   const twelveMonthsAgo = new Date();
   twelveMonthsAgo.setMonth(twelveMonthsAgo.getMonth() - 12);
@@ -54,13 +57,13 @@ export default async function CohortsPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-neu-text mb-6">Retention Cohorts</h1>
+      <h1 className="text-2xl font-bold text-neu-text mb-6">{t("retentionCohorts")}</h1>
       <div className="rounded-2xl shadow-neu bg-neu-bg overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-neu-dark/15">
-              <th className="text-left px-4 py-3 font-medium text-neu-muted">Cohort</th>
-              <th className="text-center px-4 py-3 font-medium text-neu-muted">Users</th>
+              <th className="text-left px-4 py-3 font-medium text-neu-muted">{t("cohort")}</th>
+              <th className="text-center px-4 py-3 font-medium text-neu-muted">{t("users")}</th>
               {[0, 1, 2, 3, 4, 5, 6].map((m) => (
                 <th key={m} className="text-center px-4 py-3 font-medium text-neu-muted">M{m}</th>
               ))}

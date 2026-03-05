@@ -1,8 +1,11 @@
 import { prisma } from "@/lib/prisma";
+import { getTranslations } from "next-intl/server";
 
 export const dynamic = "force-dynamic";
 
 export default async function RevenuePage() {
+  const t = await getTranslations("admin");
+
   const activeSubscriptions = await prisma.subscription.count({
     where: { status: "ACTIVE" },
   });
@@ -54,14 +57,14 @@ export default async function RevenuePage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-neu-text mb-6">Revenue Dashboard</h1>
+      <h1 className="text-2xl font-bold text-neu-text mb-6">{t("revenueDashboard")}</h1>
 
       <div className="grid md:grid-cols-4 gap-4 mb-8">
         {[
-          { label: "MRR", value: `$${mrr.toLocaleString()}`, color: "text-green-600" },
-          { label: "ARR", value: `$${arr.toLocaleString()}`, color: "text-blue-600" },
-          { label: "New (30d)", value: `+${newLast30}`, color: "text-brand-600" },
-          { label: "Churned (30d)", value: `-${canceledLast30}`, color: "text-red-600" },
+          { label: t("mrr"), value: `$${mrr.toLocaleString()}`, color: "text-green-600" },
+          { label: t("arr"), value: `$${arr.toLocaleString()}`, color: "text-blue-600" },
+          { label: t("newSubscriptions"), value: `+${newLast30}`, color: "text-brand-600" },
+          { label: t("churned"), value: `-${canceledLast30}`, color: "text-red-600" },
         ].map((stat) => (
           <div key={stat.label} className="rounded-2xl shadow-neu p-5 bg-neu-bg">
             <p className="text-xs text-neu-muted mb-1">{stat.label}</p>
@@ -71,7 +74,7 @@ export default async function RevenuePage() {
       </div>
 
       <div className="rounded-2xl shadow-neu p-6 bg-neu-bg mb-8">
-        <h2 className="font-semibold text-neu-text mb-4">Monthly Revenue</h2>
+        <h2 className="font-semibold text-neu-text mb-4">{t("monthlyRevenue")}</h2>
         <div className="flex items-end gap-3 h-48">
           {months.map((m) => (
             <div key={m.label} className="flex-1 flex flex-col items-center gap-2">
@@ -89,11 +92,11 @@ export default async function RevenuePage() {
       </div>
 
       <div className="rounded-2xl shadow-neu p-6 bg-neu-bg">
-        <h2 className="font-semibold text-neu-text mb-2">Subscription Breakdown</h2>
+        <h2 className="font-semibold text-neu-text mb-2">{t("subscriptionBreakdown")}</h2>
         <div className="text-sm text-neu-muted space-y-1">
-          <p>Monthly subscribers: {monthlySubs}</p>
-          <p>Annual subscribers: {annualSubs}</p>
-          <p>Total active: {activeSubscriptions}</p>
+          <p>{t("monthlySubscribers")}: {monthlySubs}</p>
+          <p>{t("annualSubscribers")}: {annualSubs}</p>
+          <p>{t("totalActive")}: {activeSubscriptions}</p>
         </div>
       </div>
     </div>

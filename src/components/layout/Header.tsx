@@ -16,7 +16,7 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-50 pt-4 px-4">
       <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:z-[60] focus:top-2 focus:left-2 focus:px-4 focus:py-2 focus:bg-brand-600 focus:text-white focus:rounded-lg focus:text-sm focus:font-medium">
-        Skip to content
+        {t("skipToContent")}
       </a>
       <nav className="max-w-7xl mx-auto bg-[#e0e5ec] rounded-2xl shadow-neu-sm px-6">
         <div className="flex justify-between h-16">
@@ -93,7 +93,7 @@ export default function Header() {
           <div className="md:hidden flex items-center">
             <button
               onClick={() => setMenuOpen(!menuOpen)}
-              aria-label={menuOpen ? "Close menu" : "Open menu"}
+              aria-label={menuOpen ? t("closeMenu") : t("openMenu")}
               aria-expanded={menuOpen}
               aria-controls="mobile-nav"
               className="neu-btn w-10 h-10 !p-0 rounded-xl flex items-center justify-center"

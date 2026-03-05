@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { getTranslations } from "next-intl/server";
 
 export const dynamic = "force-dynamic";
 
@@ -12,6 +13,9 @@ const icons = [
 ];
 
 export default async function AdminPage() {
+  const t = await getTranslations("admin");
+  const tc = await getTranslations("common");
+
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const weekAgo = new Date(today);
@@ -34,12 +38,12 @@ export default async function AdminPage() {
   const totalRevenue = (revenueData._sum.amount || 0) / 100;
 
   const stats = [
-    { label: "Total Users", value: userCount },
-    { label: "Active Subscriptions", value: subCount },
-    { label: "Published Steps", value: stepCount },
-    { label: "AI Requests", value: ticketCount },
-    { label: "Revenue", value: `$${totalRevenue.toFixed(0)}` },
-    { label: "AI (7 days)", value: weeklyTickets },
+    { label: t("totalUsers"), value: userCount },
+    { label: t("activeSubscriptions"), value: subCount },
+    { label: t("publishedSteps"), value: stepCount },
+    { label: t("aiRequests"), value: ticketCount },
+    { label: t("revenueLabel"), value: `$${totalRevenue.toFixed(0)}` },
+    { label: t("aiWeek"), value: weeklyTickets },
   ];
 
   const recentAudit = await prisma.auditLog.findMany({
@@ -50,7 +54,7 @@ export default async function AdminPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-neu-text mb-6">Admin Overview</h1>
+      <h1 className="text-2xl font-bold text-neu-text mb-6">{t("adminOverview")}</h1>
       <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
         {stats.map((stat, i) => (
           <div
@@ -74,7 +78,7 @@ export default async function AdminPage() {
 
       {recentAudit.length > 0 && (
         <div className="rounded-2xl shadow-neu p-6 bg-neu-bg">
-          <h2 className="font-semibold text-neu-text mb-4">Recent Activity</h2>
+          <h2 className="font-semibold text-neu-text mb-4">{t("recentActivity")}</h2>
           <div className="space-y-3">
             {recentAudit.map((log) => (
               <div key={log.id} className="flex items-center justify-between text-sm py-2 border-b border-neu-dark/10 last:border-0">
@@ -84,7 +88,7 @@ export default async function AdminPage() {
                   {log.details && <span className="text-neu-muted ml-2 text-xs">- {log.details}</span>}
                 </div>
                 <div className="text-xs text-neu-muted">
-                  {log.actor?.email || "System"} - {new Date(log.createdAt).toLocaleString()}
+                  {log.actor?.email || tc("system")} - {new Date(log.createdAt).toLocaleString()}
                 </div>
               </div>
             ))}

@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import UserRoleManager from "./UserRoleManager";
 import { calculateChurnScore, type ChurnRisk } from "@/lib/churn-scoring";
+import { getTranslations } from "next-intl/server";
 
 export const dynamic = "force-dynamic";
 
@@ -11,6 +12,8 @@ const riskBadge: Record<ChurnRisk, { bg: string; text: string }> = {
 };
 
 export default async function UsersPage() {
+  const t = await getTranslations("admin");
+
   const users = await prisma.user.findMany({
     orderBy: { createdAt: "desc" },
     take: 100,
@@ -32,17 +35,17 @@ export default async function UsersPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-neu-text mb-6">Users</h1>
+      <h1 className="text-2xl font-bold text-neu-text mb-6">{t("users")}</h1>
       <div className="rounded-2xl shadow-neu bg-neu-bg overflow-hidden">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-neu-dark/15">
-              <th className="text-left px-5 py-4 font-medium text-neu-muted">Email</th>
-              <th className="text-left px-5 py-4 font-medium text-neu-muted">Name</th>
-              <th className="text-left px-5 py-4 font-medium text-neu-muted">Role</th>
-              <th className="text-left px-5 py-4 font-medium text-neu-muted">Subscription</th>
-              <th className="text-left px-5 py-4 font-medium text-neu-muted">Churn Risk</th>
-              <th className="text-left px-5 py-4 font-medium text-neu-muted">Joined</th>
+              <th className="text-left px-5 py-4 font-medium text-neu-muted">{t("email")}</th>
+              <th className="text-left px-5 py-4 font-medium text-neu-muted">{t("name")}</th>
+              <th className="text-left px-5 py-4 font-medium text-neu-muted">{t("role")}</th>
+              <th className="text-left px-5 py-4 font-medium text-neu-muted">{t("subscription")}</th>
+              <th className="text-left px-5 py-4 font-medium text-neu-muted">{t("churnRisk")}</th>
+              <th className="text-left px-5 py-4 font-medium text-neu-muted">{t("joined")}</th>
             </tr>
           </thead>
           <tbody>

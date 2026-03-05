@@ -1,8 +1,12 @@
 import { prisma } from "@/lib/prisma";
+import { getTranslations } from "next-intl/server";
 
 export const dynamic = "force-dynamic";
 
 export default async function AuditLogPage() {
+  const t = await getTranslations("admin");
+  const tc = await getTranslations("common");
+
   const logs = await prisma.auditLog.findMany({
     orderBy: { createdAt: "desc" },
     take: 100,
@@ -13,16 +17,16 @@ export default async function AuditLogPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-neu-text mb-6">Audit Log</h1>
+      <h1 className="text-2xl font-bold text-neu-text mb-6">{t("auditLog")}</h1>
       <div className="rounded-2xl shadow-neu bg-neu-bg overflow-hidden">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-neu-dark/15">
-              <th className="text-left px-5 py-4 font-medium text-neu-muted">Date</th>
-              <th className="text-left px-5 py-4 font-medium text-neu-muted">Actor</th>
-              <th className="text-left px-5 py-4 font-medium text-neu-muted">Action</th>
-              <th className="text-left px-5 py-4 font-medium text-neu-muted">Entity</th>
-              <th className="text-left px-5 py-4 font-medium text-neu-muted">IP</th>
+              <th className="text-left px-5 py-4 font-medium text-neu-muted">{t("date")}</th>
+              <th className="text-left px-5 py-4 font-medium text-neu-muted">{t("actor")}</th>
+              <th className="text-left px-5 py-4 font-medium text-neu-muted">{t("action")}</th>
+              <th className="text-left px-5 py-4 font-medium text-neu-muted">{t("entity")}</th>
+              <th className="text-left px-5 py-4 font-medium text-neu-muted">{t("ip")}</th>
             </tr>
           </thead>
           <tbody>
@@ -32,7 +36,7 @@ export default async function AuditLogPage() {
                   {new Date(log.createdAt).toLocaleString()}
                 </td>
                 <td className="px-5 py-3 text-neu-text">
-                  {log.actor?.email || "System"}
+                  {log.actor?.email || tc("system")}
                 </td>
                 <td className="px-5 py-3">
                   <span className="neu-pill text-xs bg-blue-100 text-blue-700">{log.action}</span>
@@ -46,7 +50,7 @@ export default async function AuditLogPage() {
           </tbody>
         </table>
         {logs.length === 0 && (
-          <div className="text-center py-12 text-neu-muted">No audit logs yet.</div>
+          <div className="text-center py-12 text-neu-muted">{t("noAuditLogs")}</div>
         )}
       </div>
     </div>

@@ -1,8 +1,11 @@
 import { prisma } from "@/lib/prisma";
+import { getTranslations } from "next-intl/server";
 
 export const dynamic = "force-dynamic";
 
 export default async function AnalyticsPage() {
+  const t = await getTranslations("admin");
+
   // Get all published steps
   const steps = await prisma.step.findMany({
     where: { status: "PUBLISHED" },
@@ -54,9 +57,9 @@ export default async function AnalyticsPage() {
     _avg: { durationMs: true },
     _count: true,
   });
-  const timeMap = Object.fromEntries(timeEvents.map((t) => [t.stepId, {
-    avgMs: t._avg.durationMs || 0,
-    count: t._count,
+  const timeMap = Object.fromEntries(timeEvents.map((te) => [te.stepId, {
+    avgMs: te._avg.durationMs || 0,
+    count: te._count,
   }]));
 
   const totalUsers = await prisma.user.count();
@@ -71,29 +74,29 @@ export default async function AnalyticsPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-neu-text mb-6">Content Analytics</h1>
+      <h1 className="text-2xl font-bold text-neu-text mb-6">{t("contentAnalytics")}</h1>
 
       {/* NPS Score */}
       {npsScore !== null && (
         <div className="rounded-2xl shadow-neu p-6 bg-neu-bg mb-6 flex items-center gap-6">
           <div>
-            <p className="text-sm text-neu-muted">NPS Score</p>
+            <p className="text-sm text-neu-muted">{t("npsScore")}</p>
             <p className={`text-4xl font-bold ${npsScore >= 50 ? "text-green-600" : npsScore >= 0 ? "text-amber-600" : "text-red-600"}`}>
               {npsScore}
             </p>
           </div>
           <div className="text-xs text-neu-muted space-y-1">
-            <p>Promoters (9-10): {promoters}</p>
-            <p>Passives (7-8): {npsCount - promoters - detractors}</p>
-            <p>Detractors (0-6): {detractors}</p>
-            <p>Total responses: {npsCount}</p>
+            <p>{t("promoters")}: {promoters}</p>
+            <p>{t("passives")}: {npsCount - promoters - detractors}</p>
+            <p>{t("detractors")}: {detractors}</p>
+            <p>{t("totalResponses")}: {npsCount}</p>
           </div>
         </div>
       )}
 
       {/* Step Funnel */}
       <div className="rounded-2xl shadow-neu p-6 bg-neu-bg mb-6">
-        <h2 className="font-semibold text-neu-text mb-4">Step Completion Funnel</h2>
+        <h2 className="font-semibold text-neu-text mb-4">{t("stepCompletionFunnel")}</h2>
         <div className="space-y-2">
           {steps.map((step) => {
             const count = completionMap[step.id] || 0;
@@ -119,13 +122,13 @@ export default async function AnalyticsPage() {
                     {count} ({pct}%)
                   </span>
                 </div>
-                <div className="w-16 text-xs text-neu-muted text-center" title="AI requests">
+                <div className="w-16 text-xs text-neu-muted text-center" title={t("aiRequests")}>
                   AI: {aiCount}
                 </div>
-                <div className="w-16 text-xs text-neu-muted text-center" title="Helpful %">
+                <div className="w-16 text-xs text-neu-muted text-center" title={t("helpful")}>
                   {fbPct !== null ? `${fbPct}%` : "---"}
                 </div>
-                <div className="w-16 text-xs text-neu-muted text-center" title="Avg time">
+                <div className="w-16 text-xs text-neu-muted text-center" title={t("avgTime")}>
                   {avgMin !== null ? `${avgMin}m` : "---"}
                 </div>
               </div>
@@ -133,17 +136,17 @@ export default async function AnalyticsPage() {
           })}
         </div>
         <div className="flex items-center gap-3 text-xs text-neu-muted mt-4 pt-3 border-t border-neu-dark/10">
-          <div className="w-48">Step</div>
-          <div className="flex-1 text-center">Completions</div>
-          <div className="w-16 text-center">AI Reqs</div>
-          <div className="w-16 text-center">Helpful</div>
-          <div className="w-16 text-center">Avg Time</div>
+          <div className="w-48">{t("step")}</div>
+          <div className="flex-1 text-center">{t("completions")}</div>
+          <div className="w-16 text-center">{t("aiReqs")}</div>
+          <div className="w-16 text-center">{t("helpful")}</div>
+          <div className="w-16 text-center">{t("avgTime")}</div>
         </div>
       </div>
 
       {/* Insights */}
       <div className="rounded-2xl shadow-neu p-6 bg-neu-bg">
-        <h2 className="font-semibold text-neu-text mb-4">Insights</h2>
+        <h2 className="font-semibold text-neu-text mb-4">{t("insights")}</h2>
         <div className="grid md:grid-cols-2 gap-4 text-sm">
           {/* Highest drop-off */}
           {steps.length > 1 && (() => {
@@ -160,9 +163,9 @@ export default async function AnalyticsPage() {
             }
             return maxDrop > 0 ? (
               <div className="rounded-xl shadow-neu-xs p-4">
-                <p className="text-amber-600 font-medium text-xs mb-1">Biggest Drop-off</p>
+                <p className="text-amber-600 font-medium text-xs mb-1">{t("biggestDropOff")}</p>
                 <p className="text-neu-text">{dropStep.title}</p>
-                <p className="text-neu-muted text-xs">{maxDrop} users dropped off at this step</p>
+                <p className="text-neu-muted text-xs">{t("usersDroppedOff", { count: maxDrop })}</p>
               </div>
             ) : null;
           })()}
@@ -173,9 +176,9 @@ export default async function AnalyticsPage() {
             const maxAIStep = steps.find((s) => (aiMap[s.id] || 0) === maxAI);
             return maxAI > 0 && maxAIStep ? (
               <div className="rounded-xl shadow-neu-xs p-4">
-                <p className="text-blue-600 font-medium text-xs mb-1">Most AI Requests</p>
+                <p className="text-blue-600 font-medium text-xs mb-1">{t("mostAiRequests")}</p>
                 <p className="text-neu-text">{maxAIStep.title}</p>
-                <p className="text-neu-muted text-xs">{maxAI} AI requests (may need better instructions)</p>
+                <p className="text-neu-muted text-xs">{t("mayNeedBetterInstructions", { count: maxAI })}</p>
               </div>
             ) : null;
           })()}

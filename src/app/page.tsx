@@ -275,7 +275,7 @@ export default function LandingPage() {
           </div>
           <div className="text-center mt-8">
             <p className="text-neu-muted text-sm">
-              Each step has interactive checklists, copy-paste commands, and an AI assistant ready to help.
+              {t("stepsSubtitle")}
             </p>
           </div>
         </div>

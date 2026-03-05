@@ -1,8 +1,11 @@
 import { prisma } from "@/lib/prisma";
+import { getTranslations } from "next-intl/server";
 
 export const dynamic = "force-dynamic";
 
 export default async function TroubleshootAdminPage() {
+  const t = await getTranslations("admin");
+
   const trees = await prisma.troubleshootTree.findMany({
     include: {
       step: { select: { title: true } },
@@ -20,13 +23,13 @@ export default async function TroubleshootAdminPage() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-neu-text">Troubleshooting Trees</h1>
+        <h1 className="text-2xl font-bold text-neu-text">{t("troubleshootTrees")}</h1>
       </div>
 
       <div className="rounded-2xl shadow-neu p-6 bg-neu-bg mb-6">
-        <h2 className="font-semibold text-neu-text mb-4">Existing Trees</h2>
+        <h2 className="font-semibold text-neu-text mb-4">{t("existingTrees")}</h2>
         {trees.length === 0 ? (
-          <p className="text-sm text-neu-muted">No troubleshooting trees yet.</p>
+          <p className="text-sm text-neu-muted">{t("noTrees")}</p>
         ) : (
           <div className="space-y-2">
             {trees.map((tree) => (
@@ -37,7 +40,7 @@ export default async function TroubleshootAdminPage() {
                 <div>
                   <p className="text-sm font-medium text-neu-text">{tree.title}</p>
                   <p className="text-xs text-neu-muted">
-                    Step: {tree.step.title} | {tree._count.nodes} nodes
+                    {t("step")}: {tree.step.title} | {tree._count.nodes} {t("nodes")}
                   </p>
                 </div>
               </div>
@@ -47,9 +50,9 @@ export default async function TroubleshootAdminPage() {
       </div>
 
       <div className="rounded-2xl shadow-neu p-6 bg-neu-bg">
-        <h2 className="font-semibold text-neu-text mb-4">Steps Available</h2>
+        <h2 className="font-semibold text-neu-text mb-4">{t("stepsAvailable")}</h2>
         <p className="text-xs text-neu-muted mb-3">
-          Use the API to create troubleshooting trees for these steps.
+          {t("stepsAvailableDesc")}
         </p>
         <div className="grid md:grid-cols-2 gap-2">
           {steps.map((step) => (

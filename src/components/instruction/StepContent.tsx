@@ -40,6 +40,7 @@ export default function StepContent({
   onToggleComplete,
 }: StepContentProps) {
   const t = useTranslations("instruction");
+  const tc = useTranslations("common");
   const readingTime = estimateReadingTime(
     [contentMd, goal, prerequisites, expectedResult, commonErrors].filter(Boolean).join(" ")
   );
@@ -49,7 +50,7 @@ export default function StepContent({
       <div className="flex items-start justify-between mb-6 gap-4">
         <div>
           <h1 className="text-2xl font-bold text-neu-text">{title}</h1>
-          <span className="text-xs text-neu-muted mt-1 inline-block">{readingTime} min read</span>
+          <span className="text-xs text-neu-muted mt-1 inline-block">{tc("minRead", { count: readingTime })}</span>
         </div>
         <motion.button
           whileTap={{ scale: 0.95 }}
@@ -114,7 +115,7 @@ export default function StepContent({
           rehypePlugins={[rehypeSanitize]}
           components={{
             pre({ children }) {
-              return <CodeBlock>{children}</CodeBlock>;
+              return <CodeBlock copyLabel={tc("copy")} copiedLabel={tc("copied")}>{children}</CodeBlock>;
             },
             code({ children, className }) {
               const isInline = !className;
@@ -156,7 +157,7 @@ export default function StepContent({
   );
 }
 
-function CodeBlock({ children }: { children: React.ReactNode }) {
+function CodeBlock({ children, copyLabel, copiedLabel }: { children: React.ReactNode; copyLabel: string; copiedLabel: string }) {
   const [copied, setCopied] = useState(false);
 
   function handleCopy() {
@@ -182,7 +183,7 @@ function CodeBlock({ children }: { children: React.ReactNode }) {
         onClick={handleCopy}
         className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg shadow-neu-xs bg-gray-700 text-gray-200 px-3 py-1.5 text-xs hover:bg-gray-600"
       >
-        {copied ? "Copied!" : "Copy"}
+        {copied ? copiedLabel : copyLabel}
       </motion.button>
     </div>
   );
