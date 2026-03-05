@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -20,6 +20,10 @@ const quickActions = [
   { id: "check_missed", label: "What did I miss?" },
   { id: "alternative", label: "Alternative way" },
   { id: "generate_command", label: "Give me commands" },
+  { id: "whats_next", label: "What's next?" },
+  { id: "explain_error", label: "Fix my error" },
+  { id: "check_output", label: "Check output" },
+  { id: "security_tip", label: "Security tips" },
 ];
 
 export default function AIAssistant({ stepId }: AIAssistantProps) {
@@ -27,16 +31,24 @@ export default function AIAssistant({ stepId }: AIAssistantProps) {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [remaining, setRemaining] = useState<number | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imageBase64, setImageBase64] = useState<string | null>(null);
   const [imageMimeType, setImageMimeType] = useState<string | null>(null);
+  const [streamingContent, setStreamingContent] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages, streamingContent]);
 
   async function sendMessage(message: string, quickAction?: string) {
     if (!message.trim() && !quickAction) return;
 
     setError("");
     setLoading(true);
+    setStreamingContent("");
 
     const userMsg: ChatMessage = {
       role: "user",
@@ -45,8 +57,12 @@ export default function AIAssistant({ stepId }: AIAssistantProps) {
         : message,
       timestamp: new Date(),
     };
-    setMessages((prev) => [...prev, userMsg]);
+    const updatedMessages = [...messages, userMsg];
+    setMessages(updatedMessages);
     setInput("");
+
+    const conversationHistory = updatedMessages
+      .map((m) => ({ role: m.role, content: m.content }));
 
     try {
       const res = await fetch("/api/ai", {
@@ -58,23 +74,75 @@ export default function AIAssistant({ stepId }: AIAssistantProps) {
           quickAction,
           imageBase64,
           imageMimeType,
+          conversationHistory: conversationHistory.slice(0, -1),
+          stream: true,
         }),
       });
 
-      const data = await res.json();
-
       if (!res.ok) {
+        const data = await res.json();
         setError(data.error || "Failed to get response");
+        if (data.remaining !== undefined) setRemaining(data.remaining);
         setLoading(false);
         return;
       }
 
-      const aiMsg: ChatMessage = {
-        role: "assistant",
-        content: data.answer,
-        timestamp: new Date(),
-      };
-      setMessages((prev) => [...prev, aiMsg]);
+      const contentType = res.headers.get("content-type") || "";
+      if (contentType.includes("text/event-stream") && res.body) {
+        const remainingHeader = res.headers.get("X-Daily-Remaining");
+        if (remainingHeader) setRemaining(parseInt(remainingHeader));
+
+        const reader = res.body.getReader();
+        const decoder = new TextDecoder();
+        let fullContent = "";
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          const chunk = decoder.decode(value, { stream: true });
+          const lines = chunk.split("\n");
+
+          for (const line of lines) {
+            if (line.startsWith("data: ")) {
+              const data = line.slice(6);
+              if (data === "[DONE]") continue;
+              try {
+                const parsed = JSON.parse(data);
+                if (parsed.text) {
+                  fullContent += parsed.text;
+                  setStreamingContent(fullContent);
+                }
+                if (parsed.error) {
+                  setError(parsed.error);
+                }
+              } catch {
+                // skip malformed chunks
+              }
+            }
+          }
+        }
+
+        if (fullContent) {
+          const aiMsg: ChatMessage = {
+            role: "assistant",
+            content: fullContent,
+            timestamp: new Date(),
+          };
+          setMessages((prev) => [...prev, aiMsg]);
+          setStreamingContent("");
+        }
+      } else {
+        const data = await res.json();
+        if (data.remaining !== undefined) setRemaining(data.remaining);
+
+        const aiMsg: ChatMessage = {
+          role: "assistant",
+          content: data.answer,
+          timestamp: new Date(),
+        };
+        setMessages((prev) => [...prev, aiMsg]);
+      }
 
       setImagePreview(null);
       setImageBase64(null);
@@ -113,7 +181,12 @@ export default function AIAssistant({ stepId }: AIAssistantProps) {
   return (
     <div className="w-80 flex-shrink-0 flex flex-col bg-neu-bg m-2 rounded-2xl shadow-neu-sm">
       <div className="p-4 border-b border-neu-dark/15">
-        <h3 className="font-semibold text-neu-text text-sm">AI Assistant</h3>
+        <div className="flex items-center justify-between">
+          <h3 className="font-semibold text-neu-text text-sm">AI Assistant</h3>
+          {remaining !== null && (
+            <span className="text-xs text-neu-muted">{remaining} left today</span>
+          )}
+        </div>
         <p className="text-xs text-neu-muted mt-1">
           Ask about this step or upload a screenshot of an error
         </p>
@@ -136,7 +209,7 @@ export default function AIAssistant({ stepId }: AIAssistantProps) {
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        {messages.length === 0 && (
+        {messages.length === 0 && !streamingContent && (
           <div className="text-center text-neu-muted text-sm mt-8">
             <div className="w-12 h-12 rounded-2xl shadow-neu-sm mx-auto mb-3 flex items-center justify-center">
               <svg className="w-6 h-6 text-brand-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -170,12 +243,27 @@ export default function AIAssistant({ stepId }: AIAssistantProps) {
             </div>
           </div>
         ))}
-        {loading && (
+
+        {/* Streaming content */}
+        {streamingContent && (
+          <div className="mr-4">
+            <div className="rounded-2xl p-3.5 text-sm shadow-neu-inset-sm">
+              <div className="prose prose-sm max-w-none">
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                  {streamingContent}
+                </ReactMarkdown>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {loading && !streamingContent && (
           <div className="flex items-center gap-2 text-neu-muted text-sm">
             <div className="animate-spin w-4 h-4 border-2 border-neu-dark border-t-brand-500 rounded-full" />
             Analyzing...
           </div>
         )}
+        <div ref={messagesEndRef} />
       </div>
 
       {/* Error */}

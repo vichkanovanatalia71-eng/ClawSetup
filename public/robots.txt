@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard
+Disallow: /profile
+Disallow: /instruction
+Disallow: /admin
+Disallow: /api/
+
+Sitemap: https://clawsetup.com/sitemap.xml

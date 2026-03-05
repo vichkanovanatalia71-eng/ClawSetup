@@ -1,0 +1,68 @@
+{
+  "common": {
+    "signIn": "Увійти",
+    "signOut": "Вийти",
+    "register": "Створити акаунт",
+    "getStarted": "Почати",
+    "dashboard": "Панель",
+    "profile": "Профіль",
+    "admin": "Адмін",
+    "pricing": "Ціни",
+    "loading": "Завантаження...",
+    "save": "Зберегти",
+    "cancel": "Скасувати",
+    "delete": "Видалити",
+    "edit": "Редагувати",
+    "search": "Пошук",
+    "backToHome": "На головну"
+  },
+  "landing": {
+    "heroTitle": "Налаштуй OpenClaw",
+    "heroSubtitle": "Без головного болю",
+    "heroDescription": "Інтерактивна покрокова інструкція з AI-помічником на кожному кроці. Від нуля до повністю працюючого агента OpenClaw на Google Cloud або локально.",
+    "startGuide": "Почати налаштування",
+    "seeFeatures": "Що ви отримаєте",
+    "benefitsTitle": "Що ви отримаєте після проходження",
+    "benefitsDescription": "Кожен пункт — це перевірений, робочий результат, який у вас буде в кінці.",
+    "stepsTitle": "Покрокова структура",
+    "aiTitle": "AI-помічник на кожному кроці",
+    "pricingTitle": "Проста ціна",
+    "faqTitle": "Часті запитання",
+    "ctaTitle": "Готові налаштувати OpenClaw?",
+    "ctaDescription": "Приєднуйтесь, слідуйте крокам, і ваш AI-агент запрацює за кілька годин — не днів.",
+    "startNow": "Почати зараз"
+  },
+  "auth": {
+    "loginTitle": "Вхід до ClawSetup",
+    "registerTitle": "Створити акаунт",
+    "registerDescription": "Отримайте доступ до повної інструкції з налаштування OpenClaw з AI-допомогою.",
+    "forgotPassword": "Забули пароль?",
+    "noAccount": "Немає акаунту?",
+    "haveAccount": "Вже є акаунт?",
+    "email": "Електронна пошта",
+    "password": "Пароль",
+    "name": "Ім'я"
+  },
+  "dashboard": {
+    "title": "Панель",
+    "welcome": "З поверненням",
+    "subscriptionRequired": "Потрібна підписка",
+    "subscriptionRequiredDesc": "Вам потрібна активна підписка для доступу до інструкції.",
+    "chooseScenario": "Оберіть сценарій налаштування",
+    "subscribe": "Підписатися",
+    "continue": "Продовжити",
+    "start": "Почати"
+  },
+  "instruction": {
+    "progress": "Прогрес",
+    "markDone": "Позначити виконаним",
+    "completed": "Виконано",
+    "goal": "Мета",
+    "prerequisites": "Передумови",
+    "expectedResult": "Очікуваний результат",
+    "commonErrors": "Типові помилки",
+    "aiTitle": "AI-помічник",
+    "aiDescription": "Запитайте про цей крок або завантажте скріншот помилки",
+    "feedbackQuestion": "Цей крок був корисним?"
+  }
+}

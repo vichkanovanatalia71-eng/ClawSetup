@@ -89,6 +89,11 @@ function LoginForm() {
                 placeholder="Your password"
               />
             </div>
+            <div className="flex justify-end">
+              <Link href="/forgot-password" className="text-xs text-brand-600 hover:text-brand-700">
+                Forgot password?
+              </Link>
+            </div>
             <motion.button
               type="submit"
               disabled={loading}

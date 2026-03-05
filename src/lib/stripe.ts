@@ -21,7 +21,12 @@ export const stripe = new Proxy({} as Stripe, {
   },
 });
 
-export async function createCheckoutSession(userId: string, email: string, priceId: string) {
+export async function createCheckoutSession(
+  userId: string,
+  email: string,
+  priceId: string,
+  options?: { trialDays?: number }
+) {
   const session = await stripe.checkout.sessions.create({
     customer_email: email,
     mode: "subscription",
@@ -30,6 +35,12 @@ export async function createCheckoutSession(userId: string, email: string, price
     success_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard?checkout=success`,
     cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/pricing?checkout=canceled`,
     metadata: { userId },
+    allow_promotion_codes: true,
+    ...(options?.trialDays && {
+      subscription_data: {
+        trial_period_days: options.trialDays,
+      },
+    }),
   });
   return session;
 }

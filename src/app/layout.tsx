@@ -5,9 +5,33 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 
 export const metadata: Metadata = {
-  title: "ClawSetup - OpenClaw Setup Guide",
+  title: {
+    default: "ClawSetup — OpenClaw Setup Guide",
+    template: "%s — ClawSetup",
+  },
   description:
-    "Interactive step-by-step guide for installing and configuring OpenClaw with AI-powered assistance on every step.",
+    "Interactive step-by-step guide for installing and configuring OpenClaw with AI-powered assistance on every step. From zero to a fully running AI agent.",
+  keywords: ["OpenClaw", "AI agent", "setup guide", "Google Cloud", "VM setup", "tutorial"],
+  authors: [{ name: "ClawSetup" }],
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    siteName: "ClawSetup",
+    title: "ClawSetup — Set Up OpenClaw Without the Pain",
+    description:
+      "Interactive step-by-step guide with AI assistance on every step. From zero to a fully running OpenClaw agent.",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "ClawSetup — OpenClaw Setup Guide",
+    description:
+      "Interactive step-by-step guide with AI assistance on every step.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://clawsetup.com"),
 };
 
 export default function RootLayout({

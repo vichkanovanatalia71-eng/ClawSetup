@@ -37,8 +37,21 @@ export default async function DashboardPage() {
 
   const completedIds = new Set(progress.map((p) => p.stepId));
 
+  // Grace period: PAST_DUE users get 3 days of access
+  const isPastDueWithGrace =
+    subscription?.status === "PAST_DUE" &&
+    subscription.updatedAt &&
+    Date.now() - new Date(subscription.updatedAt).getTime() < 3 * 24 * 60 * 60 * 1000;
+
   const hasActiveSubscription =
-    subscription?.status === "ACTIVE" || subscription?.status === "TRIALING";
+    subscription?.status === "ACTIVE" ||
+    subscription?.status === "TRIALING" ||
+    isPastDueWithGrace;
+
+  const isTrialing = subscription?.status === "TRIALING";
+  const trialDaysLeft = isTrialing && subscription?.currentPeriodEnd
+    ? Math.max(0, Math.ceil((new Date(subscription.currentPeriodEnd).getTime() - Date.now()) / (24 * 60 * 60 * 1000)))
+    : 0;
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-12">
@@ -46,6 +59,26 @@ export default async function DashboardPage() {
       <p className="text-neu-muted mb-8">
         Welcome back, {session.user.name || session.user.email}!
       </p>
+
+      {isTrialing && (
+        <div className="rounded-2xl shadow-neu-sm p-6 mb-6 border-l-4 border-blue-400 bg-neu-bg">
+          <h2 className="font-semibold text-neu-text mb-1">Free Trial Active</h2>
+          <p className="text-neu-muted text-sm">
+            {trialDaysLeft} day{trialDaysLeft !== 1 ? "s" : ""} remaining in your trial.
+            Your card will be charged after the trial ends.
+          </p>
+        </div>
+      )}
+
+      {isPastDueWithGrace && (
+        <div className="rounded-2xl shadow-neu-sm p-6 mb-6 border-l-4 border-red-400 bg-neu-bg">
+          <h2 className="font-semibold text-red-600 mb-1">Payment Failed</h2>
+          <p className="text-neu-muted text-sm mb-3">
+            Your last payment failed. Please update your payment method within 3 days to keep access.
+          </p>
+          <SubscribeButton label="Update Payment" />
+        </div>
+      )}
 
       {!hasActiveSubscription && (
         <div className="rounded-2xl shadow-neu-sm p-6 mb-8 border-l-4 border-amber-400 bg-neu-bg">
@@ -132,7 +165,7 @@ export default async function DashboardPage() {
   );
 }
 
-function SubscribeButton() {
+function SubscribeButton({ label }: { label?: string } = {}) {
   return (
     <form
       action={async () => {
@@ -154,7 +187,7 @@ function SubscribeButton() {
         type="submit"
         className="neu-btn-primary rounded-full px-6 py-2.5 text-sm"
       >
-        Subscribe Now — $29/month
+        {label || "Subscribe Now — $29/month"}
       </button>
     </form>
   );

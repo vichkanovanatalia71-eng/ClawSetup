@@ -85,6 +85,7 @@ export default function StepPageClient({
           </div>
 
           <StepContent
+            stepId={step.id}
             title={step.title}
             goal={step.goal}
             prerequisites={step.prerequisites}

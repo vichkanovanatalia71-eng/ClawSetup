@@ -2,9 +2,11 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { useToast } from "@/components/ui/Toast";
 
 export default function ProfileClient({ hasSubscription }: { hasSubscription: boolean }) {
   const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
 
   async function handleManageSubscription() {
     setLoading(true);
@@ -15,7 +17,7 @@ export default function ProfileClient({ hasSubscription }: { hasSubscription: bo
         window.location.href = data.url;
       }
     } catch {
-      alert("Failed to open subscription management");
+      toast("Failed to open subscription management", "error");
     }
     setLoading(false);
   }
@@ -29,7 +31,7 @@ export default function ProfileClient({ hasSubscription }: { hasSubscription: bo
         window.location.href = data.url;
       }
     } catch {
-      alert("Failed to start checkout");
+      toast("Failed to start checkout", "error");
     }
     setLoading(false);
   }

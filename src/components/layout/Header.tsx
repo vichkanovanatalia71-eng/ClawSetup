@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import ThemeToggle from "@/components/ui/ThemeToggle";
 
 export default function Header() {
   const { data: session } = useSession();
@@ -78,6 +79,9 @@ export default function Header() {
             )}
           </div>
 
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+
           {/* Mobile menu button */}
           <div className="md:hidden flex items-center">
             <button
@@ -92,6 +96,7 @@ export default function Header() {
                 )}
               </svg>
             </button>
+          </div>
           </div>
         </div>
 

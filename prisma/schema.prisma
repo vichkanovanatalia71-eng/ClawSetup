@@ -98,6 +98,9 @@ model Subscription {
 
   user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   payments Payment[]
+
+  @@index([status])
+  @@index([stripeCustomerId])
 }
 
 model Payment {
@@ -212,20 +215,64 @@ model UserProgress {
   step Step @relation(fields: [stepId], references: [id], onDelete: Cascade)
 
   @@unique([userId, stepId])
+  @@index([userId])
+  @@index([stepId])
 }
 
 model AITicket {
-  id         String   @id @default(cuid())
-  userId     String
-  stepId     String
-  inputText  String?  @db.Text
-  imageRef   String?
-  aiAnswer   String?  @db.Text
-  tags       String[]
-  createdAt  DateTime @default(now())
+  id           String   @id @default(cuid())
+  userId       String
+  stepId       String
+  inputText    String?  @db.Text
+  imageRef     String?
+  aiAnswer     String?  @db.Text
+  inputTokens  Int?
+  outputTokens Int?
+  tags         String[]
+  createdAt    DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
   step Step @relation(fields: [stepId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([stepId])
+  @@index([createdAt])
+}
+
+model Conversation {
+  id        String   @id @default(cuid())
+  userId    String
+  stepId    String
+  messages  Json     @default("[]")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, stepId])
+  @@index([userId])
+}
+
+model UserNote {
+  id        String   @id @default(cuid())
+  userId    String
+  stepId    String
+  content   String   @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, stepId])
+  @@index([userId])
+}
+
+model StepFeedback {
+  id        String   @id @default(cuid())
+  userId    String
+  stepId    String
+  helpful   Boolean
+  comment   String?  @db.Text
+  createdAt DateTime @default(now())
+
+  @@unique([userId, stepId])
+  @@index([stepId])
 }
 
 model AuditLog {
@@ -234,6 +281,7 @@ model AuditLog {
   action    String
   entity    String
   entityId  String?
+  details   String?
   before    Json?
   after     Json?
   ip        String?
@@ -241,4 +289,8 @@ model AuditLog {
   createdAt DateTime @default(now())
 
   actor User? @relation(fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([actorId])
+  @@index([createdAt])
+  @@index([entity])
 }

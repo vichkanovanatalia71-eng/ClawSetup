@@ -1,0 +1,68 @@
+{
+  "common": {
+    "signIn": "Sign In",
+    "signOut": "Sign Out",
+    "register": "Create Account",
+    "getStarted": "Get Started",
+    "dashboard": "Dashboard",
+    "profile": "Profile",
+    "admin": "Admin",
+    "pricing": "Pricing",
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "search": "Search",
+    "backToHome": "Back to Home"
+  },
+  "landing": {
+    "heroTitle": "Set Up OpenClaw",
+    "heroSubtitle": "Without the Pain",
+    "heroDescription": "Interactive step-by-step guide with AI assistance on every step. From zero to a fully running OpenClaw agent on Google Cloud or your local machine.",
+    "startGuide": "Start Setup Guide",
+    "seeFeatures": "See What You Get",
+    "benefitsTitle": "What You Get After Completing the Guide",
+    "benefitsDescription": "Every item below is a verified, working result you will have at the end.",
+    "stepsTitle": "Step-by-Step Structure",
+    "aiTitle": "AI Assistant on Every Step",
+    "pricingTitle": "Simple Pricing",
+    "faqTitle": "Frequently Asked Questions",
+    "ctaTitle": "Ready to Set Up OpenClaw?",
+    "ctaDescription": "Join the guide, follow the steps, and have your AI agent running in a few hours — not days.",
+    "startNow": "Start Now"
+  },
+  "auth": {
+    "loginTitle": "Sign In to ClawSetup",
+    "registerTitle": "Create Your Account",
+    "registerDescription": "Get access to the full OpenClaw setup guide with AI assistance.",
+    "forgotPassword": "Forgot password?",
+    "noAccount": "Don't have an account?",
+    "haveAccount": "Already have an account?",
+    "email": "Email",
+    "password": "Password",
+    "name": "Name"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Welcome back",
+    "subscriptionRequired": "Subscription Required",
+    "subscriptionRequiredDesc": "You need an active subscription to access the setup guide.",
+    "chooseScenario": "Choose Your Setup Scenario",
+    "subscribe": "Subscribe Now",
+    "continue": "Continue",
+    "start": "Start"
+  },
+  "instruction": {
+    "progress": "Progress",
+    "markDone": "Mark as Done",
+    "completed": "Completed",
+    "goal": "Goal",
+    "prerequisites": "Prerequisites",
+    "expectedResult": "Expected Result",
+    "commonErrors": "Common Errors",
+    "aiTitle": "AI Assistant",
+    "aiDescription": "Ask about this step or upload a screenshot of an error",
+    "feedbackQuestion": "Was this step helpful?"
+  }
+}

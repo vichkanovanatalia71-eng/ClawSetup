@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: clawsetup
+      POSTGRES_PASSWORD: clawsetup_dev
+      POSTGRES_DB: clawsetup
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgresql://clawsetup:clawsetup_dev@db:5432/clawsetup?schema=public
+      NEXTAUTH_URL: http://localhost:3000
+      NEXTAUTH_SECRET: dev-secret-change-in-production
+      NODE_ENV: development
+    depends_on:
+      - db
+
+volumes:
+  pgdata:

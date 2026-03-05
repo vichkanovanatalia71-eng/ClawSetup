@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import UserRoleManager from "./UserRoleManager";
 
 export const dynamic = "force-dynamic";
 
@@ -36,16 +37,9 @@ export default async function UsersPage() {
                 }`}
               >
                 <td className="px-5 py-3.5 text-neu-text">{user.email}</td>
-                <td className="px-5 py-3.5 text-neu-muted">{user.name || "—"}</td>
+                <td className="px-5 py-3.5 text-neu-muted">{user.name || "---"}</td>
                 <td className="px-5 py-3.5">
-                  <span className={`neu-pill text-xs font-medium ${
-                    user.role === "SUPERADMIN" ? "bg-purple-100 text-purple-700" :
-                    user.role === "ADMIN" ? "bg-blue-100 text-blue-700" :
-                    user.role === "EDITOR" ? "bg-amber-100 text-amber-700" :
-                    "bg-gray-200 text-gray-600"
-                  }`}>
-                    {user.role}
-                  </span>
+                  <UserRoleManager userId={user.id} currentRole={user.role} />
                 </td>
                 <td className="px-5 py-3.5">
                   {user.subscription ? (
@@ -56,7 +50,7 @@ export default async function UsersPage() {
                       {user.subscription.status}
                     </span>
                   ) : (
-                    <span className="text-neu-muted">—</span>
+                    <span className="text-neu-muted">---</span>
                   )}
                 </td>
                 <td className="px-5 py-3.5 text-neu-muted">

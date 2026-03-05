@@ -16,6 +16,7 @@ interface AIRequestParams {
   imageBase64?: string;
   imageMimeType?: string;
   quickAction?: string;
+  conversationHistory?: { role: "user" | "assistant"; content: string }[];
 }
 
 const SYSTEM_PROMPT = `You are an expert technical support assistant for the OpenClaw setup guide.
@@ -41,37 +42,43 @@ function buildQuickActionPrompt(action: string): string {
       return "Is there an alternative way to accomplish this step? Show me a different approach if one exists.";
     case "generate_command":
       return "Generate the exact commands I need to run for this step, ready to copy-paste. Include any variable substitutions I need to make.";
+    case "whats_next":
+      return "What should I do after completing this step? What should I verify before moving on?";
+    case "check_output":
+      return "I ran the commands from this step. What should the correct output look like? Help me verify my results.";
+    case "explain_error":
+      return "I'm getting an error on this step. What are the most common causes and how do I fix them?";
+    case "security_tip":
+      return "What are the security best practices I should follow for this step?";
     default:
       return action;
   }
 }
 
+function buildContext(params: AIRequestParams): string {
+  const contextParts = [
+    `## Current Step: ${params.stepTitle}`,
+    `## Scenario: ${params.scenarioName}`,
+    params.stepGoal ? `## Goal: ${params.stepGoal}` : "",
+    params.stepPrerequisites ? `## Prerequisites: ${params.stepPrerequisites}` : "",
+    `## Step Content:\n${params.stepContent}`,
+    params.stepExpectedResult ? `## Expected Result: ${params.stepExpectedResult}` : "",
+    params.stepCommonErrors ? `## Common Errors:\n${params.stepCommonErrors}` : "",
+  ]
+    .filter(Boolean)
+    .join("\n\n");
+
+  return `${SYSTEM_PROMPT}\n\n---\n\nCONTEXT OF THE CURRENT STEP:\n\n${contextParts}`;
+}
+
 export async function getAIResponse(params: AIRequestParams): Promise<string> {
   const {
-    stepTitle,
-    stepContent,
-    stepGoal,
-    stepPrerequisites,
-    stepExpectedResult,
-    stepCommonErrors,
-    scenarioName,
     userMessage,
     imageBase64,
     imageMimeType,
     quickAction,
+    conversationHistory,
   } = params;
-
-  const contextParts = [
-    `## Current Step: ${stepTitle}`,
-    `## Scenario: ${scenarioName}`,
-    stepGoal ? `## Goal: ${stepGoal}` : "",
-    stepPrerequisites ? `## Prerequisites: ${stepPrerequisites}` : "",
-    `## Step Content:\n${stepContent}`,
-    stepExpectedResult ? `## Expected Result: ${stepExpectedResult}` : "",
-    stepCommonErrors ? `## Common Errors:\n${stepCommonErrors}` : "",
-  ]
-    .filter(Boolean)
-    .join("\n\n");
 
   const finalMessage = quickAction
     ? buildQuickActionPrompt(quickAction)
@@ -92,13 +99,89 @@ export async function getAIResponse(params: AIRequestParams): Promise<string> {
 
   content.push({ type: "text", text: finalMessage });
 
+  const messages: Anthropic.Messages.MessageParam[] = [];
+  if (conversationHistory && conversationHistory.length > 0) {
+    const recent = conversationHistory.slice(-10);
+    for (const msg of recent) {
+      messages.push({ role: msg.role, content: msg.content });
+    }
+  }
+  messages.push({ role: "user", content });
+
   const response = await anthropic.messages.create({
     model: "claude-sonnet-4-20250514",
     max_tokens: 2048,
-    system: `${SYSTEM_PROMPT}\n\n---\n\nCONTEXT OF THE CURRENT STEP:\n\n${contextParts}`,
-    messages: [{ role: "user", content }],
+    system: buildContext(params),
+    messages,
   });
 
   const textBlock = response.content.find((b) => b.type === "text");
   return textBlock ? textBlock.text : "No response generated.";
+}
+
+export async function getAIResponseStream(params: AIRequestParams): Promise<ReadableStream> {
+  const {
+    userMessage,
+    imageBase64,
+    imageMimeType,
+    quickAction,
+    conversationHistory,
+  } = params;
+
+  const finalMessage = quickAction
+    ? buildQuickActionPrompt(quickAction)
+    : userMessage;
+
+  const content: Anthropic.Messages.ContentBlockParam[] = [];
+
+  if (imageBase64 && imageMimeType) {
+    content.push({
+      type: "image",
+      source: {
+        type: "base64",
+        media_type: imageMimeType as "image/jpeg" | "image/png" | "image/webp" | "image/gif",
+        data: imageBase64,
+      },
+    });
+  }
+
+  content.push({ type: "text", text: finalMessage });
+
+  const messages: Anthropic.Messages.MessageParam[] = [];
+  if (conversationHistory && conversationHistory.length > 0) {
+    const recent = conversationHistory.slice(-10);
+    for (const msg of recent) {
+      messages.push({ role: msg.role, content: msg.content });
+    }
+  }
+  messages.push({ role: "user", content });
+
+  const stream = anthropic.messages.stream({
+    model: "claude-sonnet-4-20250514",
+    max_tokens: 2048,
+    system: buildContext(params),
+    messages,
+  });
+
+  const encoder = new TextEncoder();
+
+  return new ReadableStream({
+    async start(controller) {
+      try {
+        for await (const event of stream) {
+          if (event.type === "content_block_delta") {
+            const delta = event.delta;
+            if ("text" in delta) {
+              controller.enqueue(encoder.encode(`data: ${JSON.stringify({ text: delta.text })}\n\n`));
+            }
+          }
+        }
+        controller.enqueue(encoder.encode("data: [DONE]\n\n"));
+        controller.close();
+      } catch {
+        controller.enqueue(encoder.encode(`data: ${JSON.stringify({ error: "Stream error" })}\n\n`));
+        controller.close();
+      }
+    },
+  });
 }

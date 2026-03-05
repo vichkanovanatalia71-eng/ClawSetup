@@ -4,8 +4,10 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import FeedbackWidget from "./FeedbackWidget";
 
 interface StepContentProps {
+  stepId: string;
   title: string;
   goal: string | null;
   prerequisites: string | null;
@@ -17,6 +19,7 @@ interface StepContentProps {
 }
 
 export default function StepContent({
+  stepId,
   title,
   goal,
   prerequisites,
@@ -103,6 +106,8 @@ export default function StepContent({
           <div className="text-neu-muted text-sm whitespace-pre-wrap">{commonErrors}</div>
         </div>
       )}
+
+      <FeedbackWidget stepId={stepId} />
 
       <div className="print-warning" />
     </div>

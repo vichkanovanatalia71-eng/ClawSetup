@@ -14,6 +14,47 @@ html {
     --shadow-light: #ffffff;
   }
 
+  .dark {
+    --background: #1a1a2e;
+    --foreground: #e0e0e0;
+    --shadow-dark: #12121f;
+    --shadow-light: #22223d;
+  }
+
+  .dark body {
+    background-color: #1a1a2e;
+    color: #e0e0e0;
+  }
+
+  .dark .bg-neu-bg { background-color: #1a1a2e; }
+  .dark .text-neu-text { color: #e0e0e0; }
+  .dark .text-neu-muted { color: #8a8a9e; }
+  .dark .shadow-neu { box-shadow: 9px 9px 16px #12121f, -9px -9px 16px #22223d; }
+  .dark .shadow-neu-sm { box-shadow: 5px 5px 10px #12121f, -5px -5px 10px #22223d; }
+  .dark .shadow-neu-xs { box-shadow: 3px 3px 6px #12121f, -3px -3px 6px #22223d; }
+  .dark .shadow-neu-inset-sm { box-shadow: inset 3px 3px 6px #12121f, inset -3px -3px 6px #22223d; }
+  .dark .shadow-neu-btn { box-shadow: 5px 5px 10px #12121f, -5px -5px 10px #22223d; }
+  .dark .shadow-neu-flat { box-shadow: 3px 3px 6px #12121f, -3px -3px 6px #22223d; }
+
+  .dark .neu-input {
+    background: #1a1a2e;
+    color: #e0e0e0;
+    box-shadow: inset 3px 3px 6px #12121f, inset -3px -3px 6px #22223d;
+  }
+
+  .dark .neu-btn {
+    background: #1a1a2e;
+    color: #e0e0e0;
+    box-shadow: 5px 5px 10px #12121f, -5px -5px 10px #22223d;
+  }
+
+  .dark .neu-nav-item {
+    color: #8a8a9e;
+  }
+  .dark .neu-nav-item:hover {
+    color: #e0e0e0;
+  }
+
   body {
     background-color: var(--background);
     color: var(--foreground);
