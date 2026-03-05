@@ -249,6 +249,8 @@
     "notFoundDescription": "The page you're looking for doesn't exist.",
     "serverError": "Something went wrong",
     "serverErrorDescription": "An unexpected error occurred. Please try again.",
+    "errorBoundaryDescription": "An unexpected error occurred. Please try again or contact support if the problem persists.",
+    "tryAgain": "Try Again",
     "goHome": "Go Home"
   },
   "onboarding": {
