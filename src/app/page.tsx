@@ -77,6 +77,83 @@ const faqs = [
   },
 ];
 
+const pricingFeatures = [
+  "Full interactive guide (local + remote)",
+  "AI assistant on every step",
+  "Screenshot error analysis",
+  "Progress saving & checklists",
+  "Cancel anytime in one click",
+];
+
+function PricingToggle() {
+  const [annual, setAnnual] = useState(false);
+  return (
+    <div>
+      <div className="flex items-center justify-center gap-3 mb-8">
+        <span className={`text-sm ${!annual ? "text-neu-text font-medium" : "text-neu-muted"}`}>Monthly</span>
+        <button
+          onClick={() => setAnnual(!annual)}
+          className={`relative w-14 h-7 rounded-full transition-colors duration-200 ${annual ? "bg-brand-500" : "shadow-neu-inset-sm bg-neu-bg"}`}
+        >
+          <motion.div
+            animate={{ x: annual ? 28 : 4 }}
+            transition={{ type: "spring", stiffness: 300, damping: 20 }}
+            className="absolute top-1 w-5 h-5 rounded-full bg-white shadow-sm"
+          />
+        </button>
+        <span className={`text-sm ${annual ? "text-neu-text font-medium" : "text-neu-muted"}`}>
+          Annual <span className="text-green-600 text-xs font-medium">save 20%</span>
+        </span>
+      </div>
+      <div className="max-w-lg mx-auto">
+        <div className="rounded-2xl shadow-neu p-8 bg-neu-bg relative overflow-hidden">
+          <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-blue-500 to-brand-600" />
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={annual ? "annual" : "monthly"}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.2 }}
+            >
+              <h3 className="text-xl font-bold text-neu-text mb-2">
+                {annual ? "Annual Access" : "Monthly Access"}
+              </h3>
+              <div className="flex items-baseline gap-2 mb-6">
+                <span className="text-5xl font-bold text-neu-text">
+                  {annual ? "$278" : "$29"}
+                </span>
+                <span className="text-neu-muted">{annual ? "/year" : "/month"}</span>
+                {annual && (
+                  <span className="text-sm text-green-600 font-medium ml-2">~$23/mo</span>
+                )}
+              </div>
+            </motion.div>
+          </AnimatePresence>
+          <ul className="space-y-3 mb-8">
+            {pricingFeatures.map((f) => (
+              <li key={f} className="flex gap-3 text-neu-text text-sm">
+                <div className="w-5 h-5 rounded-md shadow-neu-inset-sm flex items-center justify-center flex-shrink-0">
+                  <svg className="w-3 h-3 text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                {f}
+              </li>
+            ))}
+          </ul>
+          <Link
+            href="/register"
+            className="block w-full neu-btn-primary rounded-full text-center py-3.5 text-base"
+          >
+            Get Started
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function FAQItem({ faq }: { faq: { q: string; a: string } }) {
   const [open, setOpen] = useState(false);
   return (
@@ -118,9 +195,34 @@ const sectionVariants = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
 };
 
+const howToSchema = {
+  "@context": "https://schema.org",
+  "@type": "HowTo",
+  name: "Set Up OpenClaw AI Agent",
+  description: "Interactive step-by-step guide to set up OpenClaw on Google Cloud or locally.",
+  step: steps.map((s, i) => ({
+    "@type": "HowToStep",
+    position: i + 1,
+    name: s.title,
+    text: s.desc,
+  })),
+};
+
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: faqs.map((f) => ({
+    "@type": "Question",
+    name: f.q,
+    acceptedAnswer: { "@type": "Answer", text: f.a },
+  })),
+};
+
 export default function LandingPage() {
   return (
     <div className="bg-neu-bg">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(howToSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
       {/* Hero */}
       <section className="py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -328,43 +430,10 @@ export default function LandingPage() {
         variants={sectionVariants}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-center text-neu-text mb-12">
+          <h2 className="text-3xl font-bold text-center text-neu-text mb-4">
             Simple Pricing
           </h2>
-          <div className="max-w-lg mx-auto">
-            <div className="rounded-2xl shadow-neu p-8 bg-neu-bg relative overflow-hidden">
-              <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-blue-500 to-brand-600" />
-              <h3 className="text-xl font-bold text-neu-text mb-2">Monthly Access</h3>
-              <div className="flex items-baseline gap-2 mb-6">
-                <span className="text-5xl font-bold text-neu-text">$29</span>
-                <span className="text-neu-muted">/month</span>
-              </div>
-              <ul className="space-y-3 mb-8">
-                {[
-                  "Full interactive guide (local + remote)",
-                  "AI assistant on every step",
-                  "Screenshot error analysis",
-                  "Progress saving & checklists",
-                  "Cancel anytime in one click",
-                ].map((f) => (
-                  <li key={f} className="flex gap-3 text-neu-text text-sm">
-                    <div className="w-5 h-5 rounded-md shadow-neu-inset-sm flex items-center justify-center flex-shrink-0">
-                      <svg className="w-3 h-3 text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                      </svg>
-                    </div>
-                    {f}
-                  </li>
-                ))}
-              </ul>
-              <Link
-                href="/register"
-                className="block w-full neu-btn-primary rounded-full text-center py-3.5 text-base"
-              >
-                Get Started
-              </Link>
-            </div>
-          </div>
+          <PricingToggle />
         </div>
       </motion.section>
 

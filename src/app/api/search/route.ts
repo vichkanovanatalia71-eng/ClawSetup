@@ -21,6 +21,7 @@ export async function GET(req: NextRequest) {
         { title: { contains: q, mode: "insensitive" } },
         { contentMd: { contains: q, mode: "insensitive" } },
         { goal: { contains: q, mode: "insensitive" } },
+        { commonErrors: { contains: q, mode: "insensitive" } },
       ],
     },
     select: {
@@ -28,6 +29,7 @@ export async function GET(req: NextRequest) {
       title: true,
       slug: true,
       goal: true,
+      contentMd: true,
       module: {
         select: {
           title: true,
@@ -38,14 +40,29 @@ export async function GET(req: NextRequest) {
     take: 10,
   });
 
-  const results = steps.map((step) => ({
-    id: step.id,
-    title: step.title,
-    goal: step.goal,
-    moduleName: step.module.title,
-    scenarioName: step.module.scenario.name,
-    url: `/instruction/${step.module.scenario.slug}/${step.slug}`,
-  }));
+  const results = steps.map((step) => {
+    // Extract a snippet around the matching query
+    let snippet = step.goal || "";
+    const lowerContent = step.contentMd.toLowerCase();
+    const lowerQuery = q.toLowerCase();
+    const idx = lowerContent.indexOf(lowerQuery);
+    if (idx !== -1) {
+      const start = Math.max(0, idx - 60);
+      const end = Math.min(step.contentMd.length, idx + q.length + 60);
+      snippet = (start > 0 ? "..." : "") + step.contentMd.slice(start, end).replace(/\n/g, " ") + (end < step.contentMd.length ? "..." : "");
+    }
+
+    return {
+      id: step.id,
+      title: step.title,
+      goal: step.goal,
+      snippet,
+      query: q,
+      moduleName: step.module.title,
+      scenarioName: step.module.scenario.name,
+      url: `/instruction/${step.module.scenario.slug}/${step.slug}`,
+    };
+  });
 
   return NextResponse.json({ results });
 }

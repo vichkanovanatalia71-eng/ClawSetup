@@ -1,10 +1,31 @@
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
+import { Metadata } from "next";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import StepPageClient from "./StepPageClient";
+import JsonLd from "@/components/seo/JsonLd";
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: { scenarioSlug: string; stepSlug: string };
+}): Promise<Metadata> {
+  const step = await prisma.step.findFirst({
+    where: {
+      slug: params.stepSlug,
+      module: { scenario: { slug: params.scenarioSlug } },
+    },
+    select: { title: true, goal: true },
+  });
+
+  return {
+    title: step ? `${step.title} — ClawSetup` : "Step — ClawSetup",
+    description: step?.goal || "Interactive OpenClaw setup guide step",
+  };
+}
 
 export default async function StepPage({
   params,
@@ -14,14 +35,12 @@ export default async function StepPage({
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) redirect("/login");
 
-  // Check subscription
   const subscription = await prisma.subscription.findUnique({
     where: { userId: session.user.id },
   });
 
-  if (!subscription || (subscription.status !== "ACTIVE" && subscription.status !== "TRIALING")) {
-    redirect("/dashboard");
-  }
+  const hasActiveSubscription =
+    subscription?.status === "ACTIVE" || subscription?.status === "TRIALING";
 
   const scenario = await prisma.scenario.findUnique({
     where: { slug: params.scenarioSlug },
@@ -68,6 +87,15 @@ export default async function StepPage({
 
   if (!currentStep) redirect(`/instruction/${params.scenarioSlug}`);
 
+  // Freemium: allow access to first module without subscription
+  const firstModuleOrder = Math.min(...scenario.modules.map((m) => m.order));
+  const stepModule = scenario.modules.find((m) => m.id === currentStep.moduleId);
+  const isFirstModule = stepModule?.order === firstModuleOrder;
+
+  if (!hasActiveSubscription && !isFirstModule) {
+    redirect("/dashboard");
+  }
+
   // Get user progress
   const progress = await prisma.userProgress.findMany({
     where: { userId: session.user.id },
@@ -98,9 +126,21 @@ export default async function StepPage({
     0
   );
 
+  const stepJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "HowToStep",
+    name: currentStep.title,
+    text: currentStep.goal || currentStep.contentMd.slice(0, 200),
+    position: currentStep.order,
+  };
+
   return (
+    <>
+    <JsonLd data={stepJsonLd} />
     <StepPageClient
       scenarioSlug={params.scenarioSlug}
+      scenarioName={scenario.name}
+      moduleTitle={currentStep.moduleTitle}
       step={{
         id: currentStep.id,
         moduleId: currentStep.moduleId,
@@ -117,5 +157,6 @@ export default async function StepPage({
       totalSteps={totalSteps}
       completedSteps={completedSteps}
     />
+    </>
   );
 }

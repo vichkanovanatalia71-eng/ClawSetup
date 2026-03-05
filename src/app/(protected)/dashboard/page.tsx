@@ -23,7 +23,7 @@ export default async function DashboardPage() {
           steps: {
             where: { status: "PUBLISHED" },
             orderBy: { order: "asc" },
-            select: { id: true },
+            select: { id: true, slug: true, title: true },
           },
         },
       },
@@ -88,7 +88,7 @@ export default async function DashboardPage() {
           <p className="text-neu-muted text-sm mb-4">
             You need an active subscription to access the setup guide.
           </p>
-          <SubscribeButton />
+          <PlanSelector />
         </div>
       )}
 
@@ -111,6 +111,23 @@ export default async function DashboardPage() {
             totalSteps > 0
               ? Math.round((completedSteps / totalSteps) * 100)
               : 0;
+
+          // Find first incomplete step for "Continue where left off"
+          let nextStep: { slug: string; title: string } | null = null;
+          for (const mod of scenario.modules) {
+            for (const s of mod.steps) {
+              if (!completedIds.has(s.id)) {
+                nextStep = { slug: s.slug, title: s.title };
+                break;
+              }
+            }
+            if (nextStep) break;
+          }
+          // If all complete, link to the first step
+          if (!nextStep && scenario.modules[0]?.steps[0]) {
+            const first = scenario.modules[0].steps[0];
+            nextStep = { slug: first.slug, title: first.title };
+          }
 
           return (
             <div
@@ -140,12 +157,19 @@ export default async function DashboardPage() {
                 </div>
               </div>
               {hasActiveSubscription ? (
-                <Link
-                  href={`/instruction/${scenario.slug}`}
-                  className="inline-block neu-btn-primary rounded-full px-6 py-2.5 text-sm"
-                >
-                  {completedSteps > 0 ? "Continue" : "Start"}
-                </Link>
+                <div>
+                  <Link
+                    href={nextStep ? `/instruction/${scenario.slug}/${nextStep.slug}` : `/instruction/${scenario.slug}`}
+                    className="inline-block neu-btn-primary rounded-full px-6 py-2.5 text-sm"
+                  >
+                    {completedSteps > 0 ? "Continue" : "Start"}
+                  </Link>
+                  {completedSteps > 0 && nextStep && percentage < 100 && (
+                    <p className="text-xs text-neu-muted mt-2">
+                      Resume: {nextStep.title}
+                    </p>
+                  )}
+                </div>
               ) : (
                 <span className="text-neu-muted text-sm">
                   Subscribe to access
@@ -165,7 +189,7 @@ export default async function DashboardPage() {
   );
 }
 
-function SubscribeButton({ label }: { label?: string } = {}) {
+function SubscribeButton({ label, plan = "monthly" }: { label?: string; plan?: "monthly" | "annual" }) {
   return (
     <form
       action={async () => {
@@ -175,6 +199,7 @@ function SubscribeButton({ label }: { label?: string } = {}) {
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ plan }),
           }
         );
         const data = await res.json();
@@ -187,8 +212,17 @@ function SubscribeButton({ label }: { label?: string } = {}) {
         type="submit"
         className="neu-btn-primary rounded-full px-6 py-2.5 text-sm"
       >
-        {label || "Subscribe Now — $29/month"}
+        {label || (plan === "annual" ? "Subscribe — $278/year (save 20%)" : "Subscribe — $29/month")}
       </button>
     </form>
+  );
+}
+
+function PlanSelector() {
+  return (
+    <div className="flex flex-col sm:flex-row gap-3">
+      <SubscribeButton plan="monthly" />
+      <SubscribeButton plan="annual" />
+    </div>
   );
 }

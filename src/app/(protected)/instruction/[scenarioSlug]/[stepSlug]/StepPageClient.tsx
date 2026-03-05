@@ -1,6 +1,8 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import StepNavigation from "@/components/instruction/StepNavigation";
 import StepContent from "@/components/instruction/StepContent";
@@ -39,6 +41,8 @@ interface StepData {
 
 interface StepPageClientProps {
   scenarioSlug: string;
+  scenarioName: string;
+  moduleTitle: string;
   step: StepData;
   navModules: NavModule[];
   totalSteps: number;
@@ -52,11 +56,14 @@ type CelebrationInfo = {
 
 export default function StepPageClient({
   scenarioSlug,
+  scenarioName,
+  moduleTitle,
   step,
   navModules,
   totalSteps,
   completedSteps: initialCompleted,
 }: StepPageClientProps) {
+  const router = useRouter();
   const [completed, setCompleted] = useState(step.completed);
   const [completedCount, setCompletedCount] = useState(initialCompleted);
   const [showAI, setShowAI] = useState(false);
@@ -114,16 +121,26 @@ export default function StepPageClient({
   }
 
   async function toggleComplete() {
+    const prevCompleted = completed;
+    const prevCount = completedCount;
     const newValue = !completed;
     setCompleted(newValue);
     const newCount = completedCount + (newValue ? 1 : -1);
     setCompletedCount(newCount);
 
-    await fetch("/api/progress", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ stepId: step.id, completed: newValue }),
-    });
+    try {
+      const res = await fetch("/api/progress", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ stepId: step.id, completed: newValue }),
+      });
+      if (!res.ok) throw new Error("Failed");
+    } catch {
+      // Rollback on failure
+      setCompleted(prevCompleted);
+      setCompletedCount(prevCount);
+      return;
+    }
 
     if (newValue) {
       checkMilestone(newCount);
@@ -131,6 +148,35 @@ export default function StepPageClient({
   }
 
   const handleCloseCelebration = useCallback(() => setCelebration(null), []);
+
+  // Compute prev/next steps for keyboard nav
+  const { prevStep, nextStep } = useMemo(() => {
+    const allSteps = navModules.flatMap((m) =>
+      m.steps.map((s) => ({ ...s, scenarioSlug }))
+    );
+    const idx = allSteps.findIndex((s) => s.id === step.id);
+    return {
+      prevStep: idx > 0 ? allSteps[idx - 1] : null,
+      nextStep: idx < allSteps.length - 1 ? allSteps[idx + 1] : null,
+    };
+  }, [navModules, step.id, scenarioSlug]);
+
+  // Keyboard navigation (Arrow keys)
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      // Don't navigate when user is typing in an input
+      const tag = (e.target as HTMLElement)?.tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
+
+      if (e.key === "ArrowLeft" && prevStep) {
+        router.push(`/instruction/${scenarioSlug}/${prevStep.slug}`);
+      } else if (e.key === "ArrowRight" && nextStep) {
+        router.push(`/instruction/${scenarioSlug}/${nextStep.slug}`);
+      }
+    }
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [prevStep, nextStep, scenarioSlug, router]);
 
   return (
     <div className="flex h-[calc(100vh-64px)] bg-neu-bg" onContextMenu={(e) => e.preventDefault()}>
@@ -152,6 +198,17 @@ export default function StepPageClient({
       {/* Center: Content */}
       <div className="flex-1 overflow-y-auto">
         <div className="max-w-3xl mx-auto px-6 py-8">
+          {/* Breadcrumbs */}
+          <nav className="flex items-center gap-1.5 text-xs text-neu-muted mb-4 flex-wrap">
+            <Link href="/dashboard" className="hover:text-neu-text transition-colors">Dashboard</Link>
+            <span>/</span>
+            <Link href={`/instruction/${scenarioSlug}`} className="hover:text-neu-text transition-colors">{scenarioName}</Link>
+            <span>/</span>
+            <span className="text-neu-muted">{moduleTitle}</span>
+            <span>/</span>
+            <span className="text-neu-text font-medium">{step.title}</span>
+          </nav>
+
           <div className="mb-6">
             <ProgressTracker
               totalSteps={totalSteps}
@@ -171,6 +228,33 @@ export default function StepPageClient({
             completed={completed}
             onToggleComplete={toggleComplete}
           />
+
+          {/* Prev / Next navigation */}
+          <div className="flex justify-between items-center mt-8 pt-6 border-t border-neu-dark/10">
+            {prevStep ? (
+              <Link
+                href={`/instruction/${scenarioSlug}/${prevStep.slug}`}
+                className="flex items-center gap-2 text-sm text-neu-muted hover:text-neu-text transition-colors"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+                <span className="max-w-[200px] truncate">{prevStep.title}</span>
+              </Link>
+            ) : <div />}
+            {nextStep ? (
+              <Link
+                href={`/instruction/${scenarioSlug}/${nextStep.slug}`}
+                prefetch
+                className="flex items-center gap-2 text-sm text-neu-muted hover:text-neu-text transition-colors"
+              >
+                <span className="max-w-[200px] truncate">{nextStep.title}</span>
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </Link>
+            ) : <div />}
+          </div>
         </div>
       </div>
 

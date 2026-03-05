@@ -154,3 +154,49 @@ export function subscriptionCanceledEmail(): { subject: string; html: string } {
     `),
   };
 }
+
+export function dunningReminderEmail(dayNumber: number): { subject: string; html: string } {
+  const isDay1 = dayNumber === 1;
+  return {
+    subject: isDay1
+      ? "Action required: Update your payment method — ClawSetup"
+      : "Reminder: Your payment is still overdue — ClawSetup",
+    html: layout(`
+      <h1 style="font-size: 24px; margin-bottom: 16px;">${
+        isDay1 ? "Payment Update Needed" : "Payment Still Overdue"
+      }</h1>
+      <p style="font-size: 14px; line-height: 1.6; color: #636e72;">
+        ${
+          isDay1
+            ? "We were unable to process your latest payment. Please update your payment method to keep your access to the setup guide."
+            : "This is a reminder that your payment is still overdue. Please update your payment method as soon as possible to avoid losing access to the setup guide."
+        }
+      </p>
+      <div style="text-align: center; margin: 32px 0;">
+        <a href="${process.env.NEXT_PUBLIC_APP_URL}/profile" style="${buttonStyle}">Update Payment</a>
+      </div>
+      <p style="font-size: 12px; color: #636e72;">
+        If you've already updated your payment method, please disregard this email.
+      </p>
+    `),
+  };
+}
+
+export function dunningFinalWarningEmail(): { subject: string; html: string } {
+  return {
+    subject: "Final warning: Your account will be suspended — ClawSetup",
+    html: layout(`
+      <h1 style="font-size: 24px; margin-bottom: 16px; color: #d63031;">Final Warning: Account Suspension</h1>
+      <p style="font-size: 14px; line-height: 1.6; color: #636e72;">
+        Your payment has been overdue for 7 days. If you do not update your payment method immediately,
+        your account access will be suspended.
+      </p>
+      <p style="font-size: 14px; line-height: 1.6; color: #636e72; font-weight: 600;">
+        This is your final notice. Please take action now to avoid interruption of service.
+      </p>
+      <div style="text-align: center; margin: 32px 0;">
+        <a href="${process.env.NEXT_PUBLIC_APP_URL}/profile" style="${buttonStyle}">Update Payment Now</a>
+      </div>
+    `),
+  };
+}

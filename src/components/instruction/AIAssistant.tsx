@@ -6,7 +6,6 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
 function formatCitations(text: string): string {
-  // Convert [Source: ...] markers to styled HTML-like markers that ReactMarkdown can render
   return text.replace(
     /\[Source: ([^\]]+)\]/g,
     '`📎 $1`'
@@ -14,6 +13,14 @@ function formatCitations(text: string): string {
     /\[General advice\]/g,
     '`⚠️ General advice`'
   );
+}
+
+function parseSuggestions(text: string): { content: string; suggestions: string[] } {
+  const match = text.match(/\[SUGGESTIONS:\s*([^\]]+)\]/);
+  if (!match) return { content: text, suggestions: [] };
+  const suggestions = match[1].split("|").map((s) => s.trim()).filter(Boolean);
+  const content = text.replace(/\[SUGGESTIONS:\s*[^\]]+\]/, "").trim();
+  return { content, suggestions };
 }
 
 interface AIAssistantProps {
@@ -47,8 +54,39 @@ export default function AIAssistant({ stepId }: AIAssistantProps) {
   const [imageBase64, setImageBase64] = useState<string | null>(null);
   const [imageMimeType, setImageMimeType] = useState<string | null>(null);
   const [streamingContent, setStreamingContent] = useState("");
+  const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [ratings, setRatings] = useState<Record<number, number>>({});
   const fileInputRef = useRef<HTMLInputElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Load conversation history on mount
+  useEffect(() => {
+    fetch(`/api/ai/history?stepId=${stepId}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data.messages) && data.messages.length > 0) {
+          setMessages(
+            data.messages.map((m: { role: string; content: string }) => ({
+              role: m.role as "user" | "assistant",
+              content: m.content,
+              timestamp: new Date(),
+            }))
+          );
+        }
+      })
+      .catch(() => {});
+  }, [stepId]);
+
+  // Save conversation when messages change
+  useEffect(() => {
+    if (messages.length === 0) return;
+    const toSave = messages.map((m) => ({ role: m.role, content: m.content }));
+    fetch("/api/ai/history", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ stepId, messages: toSave }),
+    }).catch(() => {});
+  }, [messages, stepId]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -135,9 +173,11 @@ export default function AIAssistant({ stepId }: AIAssistantProps) {
         }
 
         if (fullContent) {
+          const { content: cleanContent, suggestions: newSuggestions } = parseSuggestions(fullContent);
+          setSuggestions(newSuggestions);
           const aiMsg: ChatMessage = {
             role: "assistant",
-            content: fullContent,
+            content: cleanContent,
             timestamp: new Date(),
           };
           setMessages((prev) => [...prev, aiMsg]);
@@ -147,9 +187,11 @@ export default function AIAssistant({ stepId }: AIAssistantProps) {
         const data = await res.json();
         if (data.remaining !== undefined) setRemaining(data.remaining);
 
+        const { content: cleanContent, suggestions: newSuggestions } = parseSuggestions(data.answer);
+        setSuggestions(newSuggestions);
         const aiMsg: ChatMessage = {
           role: "assistant",
-          content: data.answer,
+          content: cleanContent,
           timestamp: new Date(),
         };
         setMessages((prev) => [...prev, aiMsg]);
@@ -194,9 +236,24 @@ export default function AIAssistant({ stepId }: AIAssistantProps) {
       <div className="p-4 border-b border-neu-dark/15">
         <div className="flex items-center justify-between">
           <h3 className="font-semibold text-neu-text text-sm">AI Assistant</h3>
-          {remaining !== null && (
-            <span className="text-xs text-neu-muted">{remaining} left today</span>
-          )}
+          <div className="flex items-center gap-2">
+            {remaining !== null && (
+              <span className="text-xs text-neu-muted">{remaining} left</span>
+            )}
+            {messages.length > 0 && (
+              <button
+                onClick={() => {
+                  setMessages([]);
+                  setSuggestions([]);
+                  fetch(`/api/ai/history?stepId=${stepId}`, { method: "DELETE" }).catch(() => {});
+                }}
+                className="text-xs text-neu-muted hover:text-red-500 transition-colors"
+                title="Clear conversation"
+              >
+                Clear
+              </button>
+            )}
+          </div>
         </div>
         <p className="text-xs text-neu-muted mt-1">
           Ask about this step or upload a screenshot of an error
@@ -252,6 +309,42 @@ export default function AIAssistant({ stepId }: AIAssistantProps) {
                 <p className="text-neu-text">{msg.content}</p>
               )}
             </div>
+            {msg.role === "assistant" && (
+              <div className="flex items-center gap-1 mt-1 ml-1">
+                <button
+                  onClick={() => {
+                    setRatings((prev) => ({ ...prev, [i]: 1 }));
+                    fetch("/api/ai/rating", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ ticketId: `msg-${i}`, rating: 1 }),
+                    }).catch(() => {});
+                  }}
+                  className={`p-1 rounded text-xs transition-colors ${ratings[i] === 1 ? "text-green-600" : "text-neu-muted hover:text-green-500"}`}
+                  title="Helpful"
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 9V5a3 3 0 00-3-3l-4 9v11h11.28a2 2 0 002-1.7l1.38-9a2 2 0 00-2-2.3H14z" />
+                  </svg>
+                </button>
+                <button
+                  onClick={() => {
+                    setRatings((prev) => ({ ...prev, [i]: -1 }));
+                    fetch("/api/ai/rating", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ ticketId: `msg-${i}`, rating: -1 }),
+                    }).catch(() => {});
+                  }}
+                  className={`p-1 rounded text-xs transition-colors ${ratings[i] === -1 ? "text-red-600" : "text-neu-muted hover:text-red-500"}`}
+                  title="Not helpful"
+                >
+                  <svg className="w-3.5 h-3.5 rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 9V5a3 3 0 00-3-3l-4 9v11h11.28a2 2 0 002-1.7l1.38-9a2 2 0 00-2-2.3H14z" />
+                  </svg>
+                </button>
+              </div>
+            )}
           </div>
         ))}
 
@@ -297,6 +390,25 @@ export default function AIAssistant({ stepId }: AIAssistantProps) {
             >
               Create Support Ticket
             </motion.button>
+          </div>
+        )}
+
+        {/* Suggested follow-up questions */}
+        {suggestions.length > 0 && !loading && (
+          <div className="flex flex-wrap gap-1.5 mt-2">
+            {suggestions.map((s, i) => (
+              <motion.button
+                key={i}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => {
+                  setSuggestions([]);
+                  sendMessage(s);
+                }}
+                className="px-3 py-1.5 rounded-full text-xs font-medium shadow-neu-xs text-brand-500 hover:shadow-neu-inset-sm transition-all duration-200"
+              >
+                {s}
+              </motion.button>
+            ))}
           </div>
         )}
 

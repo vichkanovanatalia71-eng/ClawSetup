@@ -27,17 +27,29 @@ enum StepStatus {
   PUBLISHED
 }
 
+enum Difficulty {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+}
+
 model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String    @unique
-  emailVerified DateTime?
-  image         String?
-  passwordHash  String?
-  role          Role      @default(USER)
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  lastLoginAt   DateTime?
+  id               String    @id @default(cuid())
+  name             String?
+  email            String    @unique
+  emailVerified    DateTime?
+  image            String?
+  passwordHash     String?
+  role             Role      @default(USER)
+  currentStreak    Int       @default(0)
+  longestStreak    Int       @default(0)
+  lastActiveDate   DateTime?
+  referralCode     String?   @unique
+  referredBy       String?
+  emailPreferences Json      @default("{\"weeklyDigest\":true}")
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  lastLoginAt      DateTime?
 
   accounts      Account[]
   sessions      Session[]
@@ -46,6 +58,9 @@ model User {
   aiTickets     AITicket[]
   auditLogs     AuditLog[]
   certificates  Certificate[]
+  bookmarks     Bookmark[]
+  notifications Notification[]
+  referrals     Referral[]     @relation("Referrer")
 }
 
 model Account {
@@ -94,6 +109,7 @@ model Subscription {
   currentPeriodStart   DateTime?
   currentPeriodEnd     DateTime?
   cancelAtPeriodEnd    Boolean            @default(false)
+  dunningEmailsSent    Int                @default(0)
   createdAt            DateTime           @default(now())
   updatedAt            DateTime           @updatedAt
 
@@ -156,6 +172,7 @@ model Step {
   order           Int        @default(0)
   version         Int        @default(1)
   status          StepStatus @default(DRAFT)
+  difficulty      Difficulty @default(BEGINNER)
   tags            String[]
   createdAt       DateTime   @default(now())
   updatedAt       DateTime   @updatedAt
@@ -232,6 +249,7 @@ model AITicket {
   inputTokens  Int?
   outputTokens Int?
   tags         String[]
+  rating       Int?
   createdAt    DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -377,4 +395,44 @@ model AuditLog {
   @@index([actorId])
   @@index([createdAt])
   @@index([entity])
+}
+
+model Bookmark {
+  id        String   @id @default(cuid())
+  userId    String
+  stepId    String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, stepId])
+  @@index([userId])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  type      String
+  title     String
+  message   String   @db.Text
+  read      Boolean  @default(false)
+  actionUrl String?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, read])
+  @@index([createdAt])
+}
+
+model Referral {
+  id            String   @id @default(cuid())
+  referrerId    String
+  referredId    String   @unique
+  rewardApplied Boolean  @default(false)
+  createdAt     DateTime @default(now())
+
+  referrer User @relation("Referrer", fields: [referrerId], references: [id], onDelete: Cascade)
+
+  @@index([referrerId])
 }

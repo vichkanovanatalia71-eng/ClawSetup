@@ -1,7 +1,14 @@
 import { prisma } from "@/lib/prisma";
 import UserRoleManager from "./UserRoleManager";
+import { calculateChurnScore, type ChurnRisk } from "@/lib/churn-scoring";
 
 export const dynamic = "force-dynamic";
+
+const riskBadge: Record<ChurnRisk, { bg: string; text: string }> = {
+  LOW: { bg: "bg-green-100", text: "text-green-700" },
+  MEDIUM: { bg: "bg-yellow-100", text: "text-yellow-700" },
+  HIGH: { bg: "bg-red-100", text: "text-red-700" },
+};
 
 export default async function UsersPage() {
   const users = await prisma.user.findMany({
@@ -14,6 +21,15 @@ export default async function UsersPage() {
     },
   });
 
+  // Calculate churn scores for active subscribers
+  const churnScores: Record<string, { risk: ChurnRisk; score: number }> = {};
+  for (const user of users) {
+    if (user.subscription?.status === "ACTIVE") {
+      const cs = await calculateChurnScore(user.id);
+      churnScores[user.id] = { risk: cs.risk, score: cs.score };
+    }
+  }
+
   return (
     <div>
       <h1 className="text-2xl font-bold text-neu-text mb-6">Users</h1>
@@ -25,6 +41,7 @@ export default async function UsersPage() {
               <th className="text-left px-5 py-4 font-medium text-neu-muted">Name</th>
               <th className="text-left px-5 py-4 font-medium text-neu-muted">Role</th>
               <th className="text-left px-5 py-4 font-medium text-neu-muted">Subscription</th>
+              <th className="text-left px-5 py-4 font-medium text-neu-muted">Churn Risk</th>
               <th className="text-left px-5 py-4 font-medium text-neu-muted">Joined</th>
             </tr>
           </thead>
@@ -48,6 +65,15 @@ export default async function UsersPage() {
                       "bg-gray-200 text-gray-600"
                     }`}>
                       {user.subscription.status}
+                    </span>
+                  ) : (
+                    <span className="text-neu-muted">---</span>
+                  )}
+                </td>
+                <td className="px-5 py-3.5">
+                  {churnScores[user.id] ? (
+                    <span className={`neu-pill text-xs ${riskBadge[churnScores[user.id].risk].bg} ${riskBadge[churnScores[user.id].risk].text}`}>
+                      {churnScores[user.id].risk} ({churnScores[user.id].score})
                     </span>
                   ) : (
                     <span className="text-neu-muted">---</span>

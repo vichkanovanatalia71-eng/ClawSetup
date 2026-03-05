@@ -20,6 +20,11 @@ interface StepContentProps {
   onToggleComplete: () => void;
 }
 
+function estimateReadingTime(text: string): number {
+  const words = text.replace(/[#*`\[\]()>_~|\\-]/g, " ").split(/\s+/).filter(Boolean).length;
+  return Math.max(1, Math.round(words / 200));
+}
+
 export default function StepContent({
   stepId,
   title,
@@ -32,10 +37,17 @@ export default function StepContent({
   completed,
   onToggleComplete,
 }: StepContentProps) {
+  const readingTime = estimateReadingTime(
+    [contentMd, goal, prerequisites, expectedResult, commonErrors].filter(Boolean).join(" ")
+  );
+
   return (
     <div className="protected-content no-select">
       <div className="flex items-start justify-between mb-6 gap-4">
-        <h1 className="text-2xl font-bold text-neu-text">{title}</h1>
+        <div>
+          <h1 className="text-2xl font-bold text-neu-text">{title}</h1>
+          <span className="text-xs text-neu-muted mt-1 inline-block">{readingTime} min read</span>
+        </div>
         <motion.button
           whileTap={{ scale: 0.95 }}
           onClick={onToggleComplete}

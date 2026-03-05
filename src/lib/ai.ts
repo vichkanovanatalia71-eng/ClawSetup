@@ -37,7 +37,13 @@ SOURCE CITATIONS:
 - Valid section names: "Goal", "Prerequisites", "Step Content", "Expected Result", "Common Errors"
 - Place citations at the end of the relevant paragraph
 - If the user's question is NOT covered by the step content, clearly state: "This is not covered in the current step." Then offer your best general advice, prefixed with "[General advice]".
-- Always prefer citing the step content over giving general advice.`;
+- Always prefer citing the step content over giving general advice.
+
+FOLLOW-UP SUGGESTIONS:
+- At the very end of EVERY response, add exactly 3 follow-up questions the user might ask.
+- Format them as: [SUGGESTIONS: question 1 | question 2 | question 3]
+- Make suggestions specific to the current step and the user's situation.
+- Keep each suggestion under 50 characters.`;
 
 function buildQuickActionPrompt(action: string): string {
   switch (action) {
