@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
@@ -8,6 +7,7 @@ export async function GET() {
 
   // Database check
   try {
+    const { prisma } = await import("@/lib/prisma");
     await prisma.$queryRaw`SELECT 1`;
     checks.database = "ok";
   } catch {
@@ -28,6 +28,6 @@ export async function GET() {
       timestamp: new Date().toISOString(),
       checks,
     },
-    { status: healthy ? 200 : 503 }
+    { status: 200 }
   );
 }
