@@ -198,17 +198,32 @@ function SubscribeButton({ label, plan = "monthly" }: { label: string; plan?: "m
     <form
       action={async () => {
         "use server";
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_APP_URL}/api/stripe/checkout`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ plan }),
-          }
+        const { getServerSession } = await import("next-auth");
+        const { authOptions } = await import("@/lib/auth");
+        const { createCheckoutSession } = await import("@/lib/stripe");
+
+        const sess = await getServerSession(authOptions);
+        if (!sess?.user?.id || !sess.user.email) {
+          redirect("/login");
+        }
+
+        const priceId =
+          plan === "annual"
+            ? process.env.STRIPE_PRICE_ID_ANNUAL
+            : process.env.STRIPE_PRICE_ID_MONTHLY;
+
+        if (!priceId) {
+          throw new Error("Stripe price not configured");
+        }
+
+        const checkoutSession = await createCheckoutSession(
+          sess.user.id,
+          sess.user.email,
+          priceId
         );
-        const data = await res.json();
-        if (data.url) {
-          redirect(data.url);
+
+        if (checkoutSession.url) {
+          redirect(checkoutSession.url);
         }
       }}
     >
