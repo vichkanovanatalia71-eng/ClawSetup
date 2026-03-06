@@ -186,7 +186,9 @@
     "trialDaysRemaining": "{count} day(s) remaining in your trial. Your card will be charged after the trial ends.",
     "paymentFailed": "Payment Failed",
     "paymentFailedDesc": "Your last payment failed. Please update your payment method within 3 days to keep access.",
-    "updatePayment": "Update Payment"
+    "updatePayment": "Update Payment",
+    "stripeNotConfigured": "Payment system is not configured yet. Please contact support.",
+    "checkoutFailed": "Failed to start checkout. Please try again or contact support."
   },
   "instruction": {
     "progress": "Progress",

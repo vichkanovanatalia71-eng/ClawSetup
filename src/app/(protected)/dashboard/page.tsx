@@ -8,12 +8,19 @@ import { getLocale, localized } from "@/lib/localized-content";
 
 export const dynamic = "force-dynamic";
 
-export default async function DashboardPage() {
+export default async function DashboardPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const params = await searchParams;
   const t = await getTranslations("dashboard");
   const tc = await getTranslations("common");
   const locale = await getLocale();
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) redirect("/login");
+
+  const checkoutError = params?.error as string | undefined;
 
   const subscription = await prisma.subscription.findUnique({
     where: { userId: session.user.id },
@@ -64,6 +71,16 @@ export default async function DashboardPage() {
       <p className="text-neu-muted mb-8">
         {t("welcome")}, {session.user.name || session.user.email}!
       </p>
+
+      {checkoutError && (
+        <div className="rounded-2xl shadow-neu-sm p-6 mb-6 border-l-4 border-red-400 bg-neu-bg">
+          <p className="text-red-600 text-sm">
+            {checkoutError === "stripe_not_configured"
+              ? t("stripeNotConfigured")
+              : t("checkoutFailed")}
+          </p>
+        </div>
+      )}
 
       {isTrialing && (
         <div className="rounded-2xl shadow-neu-sm p-6 mb-6 border-l-4 border-blue-400 bg-neu-bg">
@@ -213,18 +230,27 @@ function SubscribeButton({ label, plan = "monthly" }: { label: string; plan?: "m
             : process.env.STRIPE_PRICE_ID_MONTHLY;
 
         if (!priceId) {
-          throw new Error("Stripe price not configured");
+          redirect("/dashboard?error=stripe_not_configured");
         }
 
-        const checkoutSession = await createCheckoutSession(
-          sess.user.id,
-          sess.user.email,
-          priceId
-        );
-
-        if (checkoutSession.url) {
-          redirect(checkoutSession.url);
+        let checkoutUrl: string | null = null;
+        try {
+          const checkoutSession = await createCheckoutSession(
+            sess.user.id,
+            sess.user.email,
+            priceId
+          );
+          checkoutUrl = checkoutSession.url;
+        } catch (err) {
+          console.error("Stripe checkout error:", err);
+          redirect("/dashboard?error=checkout_failed");
         }
+
+        if (checkoutUrl) {
+          redirect(checkoutUrl);
+        }
+
+        redirect("/dashboard?error=checkout_failed");
       }}
     >
       <button
