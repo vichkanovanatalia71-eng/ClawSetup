@@ -25,7 +25,47 @@
     "closeMenu": "Close menu",
     "openMenu": "Open menu",
     "system": "System",
-    "unknown": "Unknown"
+    "unknown": "Unknown",
+    "confirm": "Confirm",
+    "back": "Back",
+    "clear": "Clear",
+    "submit": "Submit",
+    "view": "View",
+    "continue": "Continue",
+    "startOver": "Start over",
+    "thanksFeedback": "Thanks for your feedback!",
+    "openAdminMenu": "Open admin menu",
+    "switchToLight": "Switch to light mode",
+    "switchToDark": "Switch to dark mode"
+  },
+  "search": {
+    "placeholder": "Search steps...",
+    "ariaLabel": "Search steps",
+    "recentSearches": "Recent searches",
+    "searching": "Searching...",
+    "noResults": "No results found",
+    "navigateHint": "Use arrows to navigate",
+    "escHint": "ESC to close"
+  },
+  "nps": {
+    "question": "How likely are you to recommend ClawSetup?",
+    "dismiss": "Dismiss survey",
+    "scoreLabel": "Score {n} out of 10",
+    "notLikely": "Not likely",
+    "veryLikely": "Very likely",
+    "commentPlaceholder": "Any comments? (optional)"
+  },
+  "celebration": {
+    "guideComplete": "Guide Complete!",
+    "moduleComplete": "Module Complete!",
+    "milestone": "Milestone!",
+    "viewCertificate": "View Certificate",
+    "allStepsComplete": "You have completed all steps in this guide! Your certificate is ready.",
+    "moduleCompleted": "You completed \"{title}\"! Great progress.",
+    "milestoneReached": "{percent}% complete! Keep going, you're doing great."
+  },
+  "troubleshootWizard": {
+    "title": "Troubleshooting"
   },
   "footer": {
     "description": "Interactive step-by-step guide for setting up OpenClaw with AI-powered assistance.",
@@ -219,7 +259,18 @@
     "bookmarkAdd": "Bookmark",
     "bookmarkRemove": "Remove bookmark",
     "notes": "My Notes",
-    "notesPlaceholder": "Write your notes here..."
+    "notesPlaceholder": "Write your notes here...",
+    "networkError": "Network error. Please try again.",
+    "imageTooLarge": "Image must be under 4MB",
+    "imageFormatError": "Only JPEG, PNG, and WebP images are supported",
+    "ticketsLeft": "{remaining} left",
+    "clearConversation": "Clear conversation",
+    "emptyStateHint": "Paste an error message or upload a screenshot to get help with this step.",
+    "helpfulTooltip": "Helpful",
+    "notHelpfulTooltip": "Not helpful",
+    "supportTicketSubject": "Help with step (AI couldn't resolve)",
+    "supportTicketCreated": "Support ticket created! Our team will review your issue and the AI conversation context.",
+    "uploadScreenshot": "Upload screenshot"
   },
   "profile": {
     "title": "Profile",
@@ -238,7 +289,10 @@
     "statusCanceled": "Canceled",
     "statusInactive": "Inactive",
     "noPayments": "No payments yet.",
-    "periodEnds": "Current period ends"
+    "periodEnds": "Current period ends",
+    "failedPortal": "Failed to open subscription management",
+    "failedCheckout": "Failed to start checkout",
+    "subscribePrice": "Subscribe — $29/month"
   },
   "certificates": {
     "title": "Certificates",

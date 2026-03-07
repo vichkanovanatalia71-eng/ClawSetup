@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslations } from "next-intl";
 
 interface NavItem {
   href: string;
@@ -20,6 +21,7 @@ export default function AdminShell({
   navItems: NavItem[];
   panelTitle: string;
 }) {
+  const tc = useTranslations("common");
   const [drawerOpen, setDrawerOpen] = useState(false);
   const pathname = usePathname();
 
@@ -60,7 +62,7 @@ export default function AdminShell({
         <button
           onClick={() => setDrawerOpen(true)}
           className="w-11 h-11 rounded-xl shadow-neu flex items-center justify-center bg-neu-bg"
-          aria-label="Open admin menu"
+          aria-label={tc("openAdminMenu")}
         >
           <svg className="w-5 h-5 text-neu-text" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
@@ -91,7 +93,7 @@ export default function AdminShell({
                 <button
                   onClick={() => setDrawerOpen(false)}
                   className="w-9 h-9 rounded-xl shadow-neu-sm flex items-center justify-center"
-                  aria-label="Close menu"
+                  aria-label={tc("closeMenu")}
                 >
                   <svg className="w-5 h-5 text-neu-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />

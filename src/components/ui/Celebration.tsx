@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslations } from "next-intl";
 
 interface CelebrationProps {
   type: "module" | "milestone" | "complete";
@@ -10,6 +11,8 @@ interface CelebrationProps {
 }
 
 export default function Celebration({ type, message, onClose }: CelebrationProps) {
+  const t = useTranslations("celebration");
+  const tc = useTranslations("common");
   const [visible, setVisible] = useState(true);
 
   useEffect(() => {
@@ -72,7 +75,7 @@ export default function Celebration({ type, message, onClose }: CelebrationProps
               {type === "complete" ? "🏆" : type === "module" ? "🎉" : "⭐"}
             </div>
             <h3 className="text-xl font-bold text-neu-text mb-2">
-              {type === "complete" ? "Guide Complete!" : type === "module" ? "Module Complete!" : "Milestone!"}
+              {type === "complete" ? t("guideComplete") : type === "module" ? t("moduleComplete") : t("milestone")}
             </h3>
             <p className="text-neu-muted text-sm mb-4">{message}</p>
             <motion.button
@@ -80,7 +83,7 @@ export default function Celebration({ type, message, onClose }: CelebrationProps
               onClick={() => { setVisible(false); setTimeout(onClose, 300); }}
               className="neu-btn-primary rounded-full px-6 py-2.5 text-sm"
             >
-              {type === "complete" ? "View Certificate" : "Continue"}
+              {type === "complete" ? t("viewCertificate") : tc("continue")}
             </motion.button>
           </motion.div>
         </motion.div>

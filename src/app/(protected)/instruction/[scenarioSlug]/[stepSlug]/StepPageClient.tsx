@@ -66,6 +66,8 @@ export default function StepPageClient({
 }: StepPageClientProps) {
   const router = useRouter();
   const t = useTranslations("instruction");
+  const tc = useTranslations("common");
+  const tCel = useTranslations("celebration");
   const [completed, setCompleted] = useState(step.completed);
   const [completedCount, setCompletedCount] = useState(initialCompleted);
   const [showAI, setShowAI] = useState(false);
@@ -94,7 +96,7 @@ export default function StepPageClient({
   function checkMilestone(newCount: number) {
     // Check 100% completion
     if (newCount === totalSteps) {
-      setCelebration({ type: "complete", message: "You have completed all steps in this guide! Your certificate is ready." });
+      setCelebration({ type: "complete", message: tCel("allStepsComplete") });
       return;
     }
 
@@ -106,7 +108,7 @@ export default function StepPageClient({
         s.id === step.id ? true : s.completed
       );
       if (allModuleDone) {
-        setCelebration({ type: "module", message: `You completed "${currentModule.title}"! Great progress.` });
+        setCelebration({ type: "module", message: tCel("moduleCompleted", { title: currentModule.title }) });
         return;
       }
     }
@@ -116,7 +118,7 @@ export default function StepPageClient({
     const prevPct = Math.round(((newCount - 1) / totalSteps) * 100);
     for (const milestone of [75, 50, 25]) {
       if (pct >= milestone && prevPct < milestone) {
-        setCelebration({ type: "milestone", message: `${milestone}% complete! Keep going, you're doing great.` });
+        setCelebration({ type: "milestone", message: tCel("milestoneReached", { percent: milestone }) });
         return;
       }
     }
@@ -202,7 +204,7 @@ export default function StepPageClient({
         <div className="max-w-3xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
           {/* Breadcrumbs */}
           <nav className="flex items-center gap-1.5 text-xs text-neu-muted mb-4 flex-wrap">
-            <Link href="/dashboard" className="hover:text-neu-text transition-colors">Dashboard</Link>
+            <Link href="/dashboard" className="hover:text-neu-text transition-colors">{tc("dashboard")}</Link>
             <span>/</span>
             <Link href={`/instruction/${scenarioSlug}`} className="hover:text-neu-text transition-colors">{scenarioName}</Link>
             <span>/</span>

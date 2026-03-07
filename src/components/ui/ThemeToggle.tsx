@@ -2,8 +2,10 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import { useTranslations } from "next-intl";
 
 export default function ThemeToggle() {
+  const tc = useTranslations("common");
   const [dark, setDark] = useState(false);
 
   useEffect(() => {
@@ -26,7 +28,7 @@ export default function ThemeToggle() {
       whileTap={{ scale: 0.9 }}
       onClick={toggle}
       className="w-11 h-11 rounded-xl shadow-neu-xs flex items-center justify-center text-neu-muted hover:text-neu-text transition-colors"
-      aria-label={dark ? "Switch to light mode" : "Switch to dark mode"}
+      aria-label={dark ? tc("switchToLight") : tc("switchToDark")}
     >
       {dark ? (
         <svg className="w-4.5 h-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

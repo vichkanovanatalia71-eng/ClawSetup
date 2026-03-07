@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslations } from "next-intl";
 
 interface TroubleshootNode {
   id: string;
@@ -20,6 +21,8 @@ interface TroubleshootTree {
 }
 
 export default function TroubleshootWizard({ stepId }: { stepId: string }) {
+  const t = useTranslations("troubleshootWizard");
+  const tc = useTranslations("common");
   const [trees, setTrees] = useState<TroubleshootTree[]>([]);
   const [activeTree, setActiveTree] = useState<TroubleshootTree | null>(null);
   const [currentNodeId, setCurrentNodeId] = useState<string | null>(null);
@@ -69,7 +72,7 @@ export default function TroubleshootWizard({ stepId }: { stepId: string }) {
 
   return (
     <div className="rounded-2xl shadow-neu-sm p-5 mb-6 border-l-4 border-purple-400 bg-neu-bg">
-      <h3 className="font-semibold text-neu-text text-sm mb-3">Troubleshooting</h3>
+      <h3 className="font-semibold text-neu-text text-sm mb-3">{t("title")}</h3>
 
       {!activeTree ? (
         <div className="space-y-2">
@@ -119,14 +122,14 @@ export default function TroubleshootWizard({ stepId }: { stepId: string }) {
                       onClick={goBack}
                       className="text-xs text-neu-muted hover:text-neu-text transition-colors"
                     >
-                      Back
+                      {tc("back")}
                     </button>
                   )}
                   <button
                     onClick={reset}
                     className="text-xs text-neu-muted hover:text-neu-text transition-colors"
                   >
-                    Start over
+                    {tc("startOver")}
                   </button>
                 </div>
               </>

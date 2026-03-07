@@ -25,7 +25,47 @@
     "closeMenu": "Закрити меню",
     "openMenu": "Відкрити меню",
     "system": "Система",
-    "unknown": "Невідомий"
+    "unknown": "Невідомий",
+    "confirm": "Підтвердити",
+    "back": "Назад",
+    "clear": "Очистити",
+    "submit": "Надіслати",
+    "view": "Переглянути",
+    "continue": "Продовжити",
+    "startOver": "Почати спочатку",
+    "thanksFeedback": "Дякуємо за відгук!",
+    "openAdminMenu": "Відкрити меню адміністратора",
+    "switchToLight": "Перемкнути на світлу тему",
+    "switchToDark": "Перемкнути на темну тему"
+  },
+  "search": {
+    "placeholder": "Пошук кроків...",
+    "ariaLabel": "Пошук кроків",
+    "recentSearches": "Нещодавні пошуки",
+    "searching": "Пошук...",
+    "noResults": "Нічого не знайдено",
+    "navigateHint": "Стрілки для навігації",
+    "escHint": "ESC щоб закрити"
+  },
+  "nps": {
+    "question": "Наскільки ймовірно, що ви порекомендуєте ClawSetup?",
+    "dismiss": "Закрити опитування",
+    "scoreLabel": "Оцінка {n} з 10",
+    "notLikely": "Малоймовірно",
+    "veryLikely": "Дуже ймовірно",
+    "commentPlaceholder": "Коментар (необов'язково)"
+  },
+  "celebration": {
+    "guideComplete": "Гайд завершено!",
+    "moduleComplete": "Модуль завершено!",
+    "milestone": "Досягнення!",
+    "viewCertificate": "Переглянути сертифікат",
+    "allStepsComplete": "Ви завершили всі кроки цього гайду! Ваш сертифікат готовий.",
+    "moduleCompleted": "Ви завершили \"{title}\"! Чудовий прогрес.",
+    "milestoneReached": "{percent}% завершено! Продовжуйте, ви чудово справляєтесь."
+  },
+  "troubleshootWizard": {
+    "title": "Діагностика"
   },
   "footer": {
     "description": "Інтерактивна покрокова інструкція з налаштування OpenClaw з AI-помічником.",
@@ -219,7 +259,18 @@
     "bookmarkAdd": "Закладка",
     "bookmarkRemove": "Видалити закладку",
     "notes": "Мої нотатки",
-    "notesPlaceholder": "Запишіть нотатки тут..."
+    "notesPlaceholder": "Запишіть нотатки тут...",
+    "networkError": "Помилка мережі. Спробуйте ще раз.",
+    "imageTooLarge": "Зображення має бути менше 4МБ",
+    "imageFormatError": "Підтримуються лише формати JPEG, PNG та WebP",
+    "ticketsLeft": "Залишилось {remaining}",
+    "clearConversation": "Очистити розмову",
+    "emptyStateHint": "Вставте повідомлення про помилку або завантажте скріншот, щоб отримати допомогу з цим кроком.",
+    "helpfulTooltip": "Корисно",
+    "notHelpfulTooltip": "Не корисно",
+    "supportTicketSubject": "Допомога з кроком (AI не вирішив)",
+    "supportTicketCreated": "Тікет підтримки створено! Наша команда перегляне вашу проблему та контекст AI-розмови.",
+    "uploadScreenshot": "Завантажити скріншот"
   },
   "profile": {
     "title": "Профіль",
@@ -238,7 +289,10 @@
     "statusCanceled": "Скасована",
     "statusInactive": "Неактивна",
     "noPayments": "Оплат поки немає.",
-    "periodEnds": "Поточний період закінчується"
+    "periodEnds": "Поточний період закінчується",
+    "failedPortal": "Не вдалося відкрити керування підпискою",
+    "failedCheckout": "Не вдалося розпочати оплату",
+    "subscribePrice": "Підписатися — $29/місяць"
   },
   "certificates": {
     "title": "Сертифікати",

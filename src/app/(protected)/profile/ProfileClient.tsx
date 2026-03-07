@@ -3,8 +3,11 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { useToast } from "@/components/ui/Toast";
+import { useTranslations } from "next-intl";
 
 export default function ProfileClient({ hasSubscription }: { hasSubscription: boolean }) {
+  const t = useTranslations("profile");
+  const tc = useTranslations("common");
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
@@ -17,7 +20,7 @@ export default function ProfileClient({ hasSubscription }: { hasSubscription: bo
         window.location.href = data.url;
       }
     } catch {
-      toast("Failed to open subscription management", "error");
+      toast(t("failedPortal"), "error");
     }
     setLoading(false);
   }
@@ -31,7 +34,7 @@ export default function ProfileClient({ hasSubscription }: { hasSubscription: bo
         window.location.href = data.url;
       }
     } catch {
-      toast("Failed to start checkout", "error");
+      toast(t("failedCheckout"), "error");
     }
     setLoading(false);
   }
@@ -44,7 +47,7 @@ export default function ProfileClient({ hasSubscription }: { hasSubscription: bo
         disabled={loading}
         className="mt-2 neu-btn rounded-full px-5 py-2 text-sm font-medium text-brand-600 disabled:opacity-50"
       >
-        {loading ? "Loading..." : "Manage Subscription"}
+        {loading ? tc("loading") : t("manageSubscription")}
       </motion.button>
     );
   }
@@ -56,7 +59,7 @@ export default function ProfileClient({ hasSubscription }: { hasSubscription: bo
       disabled={loading}
       className="neu-btn-primary rounded-full px-6 py-2.5 text-sm disabled:opacity-50"
     >
-      {loading ? "Loading..." : "Subscribe — $29/month"}
+      {loading ? tc("loading") : t("subscribePrice")}
     </motion.button>
   );
 }

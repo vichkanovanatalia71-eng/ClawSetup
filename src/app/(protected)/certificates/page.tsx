@@ -67,7 +67,7 @@ export default async function CertificatesPage() {
                   href={`/verify/${cert.certificateHash}`}
                   className="text-xs text-brand-500 hover:text-brand-600 transition-colors"
                 >
-                  View
+                  {tc("view")}
                 </Link>
               </div>
             </div>

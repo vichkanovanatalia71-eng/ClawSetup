@@ -2,8 +2,11 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslations } from "next-intl";
 
 export default function NPSSurvey() {
+  const t = useTranslations("nps");
+  const tc = useTranslations("common");
   const [show, setShow] = useState(false);
   const [score, setScore] = useState<number | null>(null);
   const [comment, setComment] = useState("");
@@ -58,13 +61,13 @@ export default function NPSSurvey() {
       >
         {submitted ? (
           <div className="text-center py-4">
-            <p className="text-green-600 font-medium text-sm">Thanks for your feedback!</p>
+            <p className="text-green-600 font-medium text-sm">{tc("thanksFeedback")}</p>
           </div>
         ) : (
           <>
             <div className="flex justify-between items-start mb-3">
-              <p className="text-sm font-semibold text-neu-text">How likely are you to recommend ClawSetup?</p>
-              <button onClick={dismiss} aria-label="Dismiss survey" className="text-neu-muted text-xs hover:text-neu-text ml-2">
+              <p className="text-sm font-semibold text-neu-text">{t("question")}</p>
+              <button onClick={dismiss} aria-label={t("dismiss")} className="text-neu-muted text-xs hover:text-neu-text ml-2">
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
@@ -75,7 +78,7 @@ export default function NPSSurvey() {
                 <button
                   key={n}
                   onClick={() => setScore(n)}
-                  aria-label={`Score ${n} out of 10`}
+                  aria-label={t("scoreLabel", { n })}
                   aria-pressed={score === n}
                   className={`w-8 h-8 sm:w-7 sm:h-7 rounded-lg text-xs font-medium transition-all ${
                     score === n
@@ -88,15 +91,15 @@ export default function NPSSurvey() {
               ))}
             </div>
             <div className="flex justify-between text-xs text-neu-muted mb-3">
-              <span>Not likely</span>
-              <span>Very likely</span>
+              <span>{t("notLikely")}</span>
+              <span>{t("veryLikely")}</span>
             </div>
             {score !== null && (
               <motion.div initial={{ height: 0 }} animate={{ height: "auto" }}>
                 <textarea
                   value={comment}
                   onChange={(e) => setComment(e.target.value)}
-                  placeholder="Any comments? (optional)"
+                  placeholder={t("commentPlaceholder")}
                   className="neu-input w-full text-xs mb-3"
                   rows={2}
                 />
@@ -105,7 +108,7 @@ export default function NPSSurvey() {
                   onClick={handleSubmit}
                   className="w-full neu-btn-primary rounded-full py-2 text-xs"
                 >
-                  Submit
+                  {tc("submit")}
                 </motion.button>
               </motion.div>
             )}

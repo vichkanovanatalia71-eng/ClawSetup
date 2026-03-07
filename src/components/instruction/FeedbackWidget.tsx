@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 
 export default function FeedbackWidget({ stepId }: { stepId: string }) {
   const t = useTranslations("instruction");
+  const tc = useTranslations("common");
   const [submitted, setSubmitted] = useState(false);
 
   useEffect(() => {
@@ -35,7 +36,7 @@ export default function FeedbackWidget({ stepId }: { stepId: string }) {
       <p className="text-sm text-neu-muted mb-3">{t("feedbackQuestion")}</p>
       {submitted ? (
         <p className="text-sm text-green-600 font-medium">
-          Thanks for your feedback!
+          {tc("thanksFeedback")}
         </p>
       ) : (
         <div className="flex justify-center gap-3">

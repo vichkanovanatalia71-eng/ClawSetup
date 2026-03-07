@@ -133,7 +133,7 @@ export default function AIAssistant({ stepId }: AIAssistantProps) {
 
       if (!res.ok) {
         const data = await res.json();
-        setError(data.error || "Failed to get response");
+        setError(data.error || t("networkError"));
         if (data.remaining !== undefined) setRemaining(data.remaining);
         setLoading(false);
         return;
@@ -204,7 +204,7 @@ export default function AIAssistant({ stepId }: AIAssistantProps) {
       setImageBase64(null);
       setImageMimeType(null);
     } catch {
-      setError("Network error. Please try again.");
+      setError(t("networkError"));
     }
 
     setLoading(false);
@@ -215,12 +215,12 @@ export default function AIAssistant({ stepId }: AIAssistantProps) {
     if (!file) return;
 
     if (file.size > 4 * 1024 * 1024) {
-      setError("Image must be under 4MB");
+      setError(t("imageTooLarge"));
       return;
     }
 
     if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
-      setError("Only JPEG, PNG, and WebP images are supported");
+      setError(t("imageFormatError"));
       return;
     }
 
@@ -241,7 +241,7 @@ export default function AIAssistant({ stepId }: AIAssistantProps) {
           <h3 className="font-semibold text-neu-text text-sm">{t("aiTitle")}</h3>
           <div className="flex items-center gap-2">
             {remaining !== null && (
-              <span className="text-xs text-neu-muted">{remaining} left</span>
+              <span className="text-xs text-neu-muted">{t("ticketsLeft", { remaining })}</span>
             )}
             {messages.length > 0 && (
               <button
@@ -251,9 +251,9 @@ export default function AIAssistant({ stepId }: AIAssistantProps) {
                   fetch(`/api/ai/history?stepId=${stepId}`, { method: "DELETE" }).catch(() => {});
                 }}
                 className="text-xs text-neu-muted hover:text-red-500 transition-colors"
-                title="Clear conversation"
+                title={t("clearConversation")}
               >
-                Clear
+                {t("clearConversation")}
               </button>
             )}
           </div>
@@ -287,7 +287,7 @@ export default function AIAssistant({ stepId }: AIAssistantProps) {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
               </svg>
             </div>
-            <p>Paste an error message or upload a screenshot to get help with this step.</p>
+            <p>{t("emptyStateHint")}</p>
           </div>
         )}
         {messages.map((msg, i) => (
@@ -324,7 +324,7 @@ export default function AIAssistant({ stepId }: AIAssistantProps) {
                     }).catch(() => {});
                   }}
                   className={`p-1 rounded text-xs transition-colors ${ratings[i] === 1 ? "text-green-600" : "text-neu-muted hover:text-green-500"}`}
-                  title="Helpful"
+                  title={t("helpfulTooltip")}
                 >
                   <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 9V5a3 3 0 00-3-3l-4 9v11h11.28a2 2 0 002-1.7l1.38-9a2 2 0 00-2-2.3H14z" />
@@ -340,7 +340,7 @@ export default function AIAssistant({ stepId }: AIAssistantProps) {
                     }).catch(() => {});
                   }}
                   className={`p-1 rounded text-xs transition-colors ${ratings[i] === -1 ? "text-red-600" : "text-neu-muted hover:text-red-500"}`}
-                  title="Not helpful"
+                  title={t("notHelpfulTooltip")}
                 >
                   <svg className="w-3.5 h-3.5 rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 9V5a3 3 0 00-3-3l-4 9v11h11.28a2 2 0 002-1.7l1.38-9a2 2 0 00-2-2.3H14z" />
@@ -378,16 +378,16 @@ export default function AIAssistant({ stepId }: AIAssistantProps) {
               whileTap={{ scale: 0.95 }}
               onClick={() => {
                 const snapshot = messages.map((m) => ({ role: m.role, content: m.content.slice(0, 500) }));
-                const subject = `Help with step (AI couldn't resolve)`;
+                const subject = t("supportTicketSubject");
                 fetch("/api/support", {
                   method: "POST",
                   headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ stepId, subject, message: "AI assistant could not resolve my issue. Please see conversation history.", aiSnapshot: snapshot }),
+                  body: JSON.stringify({ stepId, subject, message: t("supportTicketSubject"), aiSnapshot: snapshot }),
                 }).then(() => {
                   setError("");
-                  const infoMsg: ChatMessage = { role: "assistant", content: "Support ticket created! Our team will review your issue and the AI conversation context.", timestamp: new Date() };
+                  const infoMsg: ChatMessage = { role: "assistant", content: t("supportTicketCreated"), timestamp: new Date() };
                   setMessages((prev) => [...prev, infoMsg]);
-                }).catch(() => setError("Failed to create support ticket"));
+                }).catch(() => setError(t("networkError")));
               }}
               className="px-4 py-1.5 rounded-full text-xs font-medium shadow-neu-xs text-amber-600 hover:shadow-neu-inset-sm transition-all"
             >
@@ -455,7 +455,7 @@ export default function AIAssistant({ stepId }: AIAssistantProps) {
             whileTap={{ scale: 0.9 }}
             onClick={() => fileInputRef.current?.click()}
             className="w-10 h-10 rounded-xl shadow-neu-xs flex items-center justify-center text-neu-muted hover:text-brand-500 transition-colors flex-shrink-0"
-            title="Upload screenshot"
+            title={t("uploadScreenshot")}
           >
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />

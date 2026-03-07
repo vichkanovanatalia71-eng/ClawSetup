@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslations } from "next-intl";
 
 interface ConfirmDialogProps {
   open: boolean;
@@ -18,13 +19,17 @@ export default function ConfirmDialog({
   open,
   title,
   message,
-  confirmLabel = "Confirm",
-  cancelLabel = "Cancel",
+  confirmLabel,
+  cancelLabel,
   variant = "default",
   onConfirm,
   onCancel,
 }: ConfirmDialogProps) {
+  const tc = useTranslations("common");
   const cancelRef = useRef<HTMLButtonElement>(null);
+
+  const resolvedConfirmLabel = confirmLabel ?? tc("confirm");
+  const resolvedCancelLabel = cancelLabel ?? tc("cancel");
 
   useEffect(() => {
     if (open) cancelRef.current?.focus();
@@ -68,7 +73,7 @@ export default function ConfirmDialog({
                 onClick={onCancel}
                 className="neu-btn rounded-full px-5 py-2 text-sm text-neu-muted"
               >
-                {cancelLabel}
+                {resolvedCancelLabel}
               </motion.button>
               <motion.button
                 whileTap={{ scale: 0.97 }}
@@ -79,7 +84,7 @@ export default function ConfirmDialog({
                     : "bg-brand-600 hover:bg-brand-700"
                 } shadow-sm transition-colors`}
               >
-                {confirmLabel}
+                {resolvedConfirmLabel}
               </motion.button>
             </div>
           </motion.div>

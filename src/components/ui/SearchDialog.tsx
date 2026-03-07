@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslations } from "next-intl";
 
 interface SearchResult {
   id: string;
@@ -50,6 +51,7 @@ function HighlightMatch({ text, query }: { text: string; query: string }) {
 }
 
 export default function SearchDialog() {
+  const t = useTranslations("search");
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResult[]>([]);
@@ -149,8 +151,8 @@ export default function SearchDialog() {
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder="Search steps..."
-                aria-label="Search steps"
+                placeholder={t("placeholder")}
+                aria-label={t("ariaLabel")}
                 role="combobox"
                 aria-expanded={results.length > 0}
                 aria-controls="search-results"
@@ -162,7 +164,7 @@ export default function SearchDialog() {
             {/* Recent searches */}
             {query.length < 2 && recentSearches.length > 0 && (
               <div className="px-4 pb-3">
-                <p className="text-xs text-neu-muted mb-2">Recent searches</p>
+                <p className="text-xs text-neu-muted mb-2">{t("recentSearches")}</p>
                 <div className="flex flex-wrap gap-1.5">
                   {recentSearches.map((s) => (
                     <button
@@ -178,7 +180,7 @@ export default function SearchDialog() {
             )}
 
             {loading && (
-              <div className="px-4 pb-3 text-sm text-neu-muted">Searching...</div>
+              <div className="px-4 pb-3 text-sm text-neu-muted">{t("searching")}</div>
             )}
             {results.length > 0 && (
               <div id="search-results" role="listbox" className="max-h-80 overflow-y-auto px-4 pb-4 space-y-1">
@@ -209,11 +211,11 @@ export default function SearchDialog() {
               </div>
             )}
             {query.length >= 2 && !loading && results.length === 0 && (
-              <div aria-live="polite" className="px-4 pb-4 text-sm text-neu-muted text-center">No results found</div>
+              <div aria-live="polite" className="px-4 pb-4 text-sm text-neu-muted text-center">{t("noResults")}</div>
             )}
             <div className="px-4 py-2 border-t border-neu-dark/10 text-xs text-neu-muted flex justify-between">
-              <span>Use arrows to navigate</span>
-              <span>ESC to close</span>
+              <span>{t("navigateHint")}</span>
+              <span>{t("escHint")}</span>
             </div>
           </motion.div>
         </motion.div>
