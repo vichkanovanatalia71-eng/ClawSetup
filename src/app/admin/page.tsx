@@ -55,7 +55,7 @@ export default async function AdminPage() {
   return (
     <div>
       <h1 className="text-2xl font-bold text-neu-text mb-6">{t("adminOverview")}</h1>
-      <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
         {stats.map((stat, i) => (
           <div
             key={stat.label}
@@ -81,13 +81,13 @@ export default async function AdminPage() {
           <h2 className="font-semibold text-neu-text mb-4">{t("recentActivity")}</h2>
           <div className="space-y-3">
             {recentAudit.map((log) => (
-              <div key={log.id} className="flex items-center justify-between text-sm py-2 border-b border-neu-dark/10 last:border-0">
+              <div key={log.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 text-sm py-2 border-b border-neu-dark/10 last:border-0">
                 <div>
                   <span className="text-neu-text font-medium">{log.action}</span>
                   <span className="text-neu-muted ml-2">{log.entity}</span>
                   {log.details && <span className="text-neu-muted ml-2 text-xs">- {log.details}</span>}
                 </div>
-                <div className="text-xs text-neu-muted">
+                <div className="text-xs text-neu-muted shrink-0">
                   {log.actor?.email || tc("system")} - {new Date(log.createdAt).toLocaleString()}
                 </div>
               </div>

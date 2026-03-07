@@ -31,11 +31,11 @@ export default async function ProfilePage() {
       <div className="rounded-2xl shadow-neu p-6 mb-6 bg-neu-bg">
         <h2 className="font-semibold text-neu-text mb-4">{t("accountInfo")}</h2>
         <div className="space-y-3 text-sm">
-          <div className="flex justify-between items-center">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1">
             <span className="text-neu-muted">{ta("email")}</span>
-            <span className="rounded-xl shadow-neu-inset-sm px-4 py-1.5 text-neu-text">{session.user.email}</span>
+            <span className="rounded-xl shadow-neu-inset-sm px-4 py-1.5 text-neu-text truncate max-w-[250px] sm:max-w-none">{session.user.email}</span>
           </div>
-          <div className="flex justify-between items-center">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1">
             <span className="text-neu-muted">{ta("name")}</span>
             <span className="rounded-xl shadow-neu-inset-sm px-4 py-1.5 text-neu-text">{session.user.name || "—"}</span>
           </div>
@@ -63,7 +63,7 @@ export default async function ProfilePage() {
             </div>
             {subscription.currentPeriodEnd && (
               <div className="flex justify-between text-sm">
-                <span className="text-neu-muted">Current period ends</span>
+                <span className="text-neu-muted">{t("periodEnds")}</span>
                 <span className="text-neu-text">
                   {new Date(subscription.currentPeriodEnd).toLocaleDateString()}
                 </span>
@@ -93,7 +93,7 @@ export default async function ProfilePage() {
               {subscription.payments.map((payment) => (
                 <div
                   key={payment.id}
-                  className="flex justify-between items-center text-sm py-3 border-b border-neu-dark/15 last:border-0"
+                  className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 text-sm py-3 border-b border-neu-dark/15 last:border-0"
                 >
                   <div>
                     <span className="text-neu-text font-medium">
@@ -104,7 +104,7 @@ export default async function ProfilePage() {
                     </span>
                   </div>
                   <span
-                    className={`neu-pill text-xs ${
+                    className={`neu-pill text-xs self-start sm:self-auto ${
                       payment.status === "succeeded"
                         ? "bg-green-100 text-green-700"
                         : "bg-gray-100 text-gray-600"

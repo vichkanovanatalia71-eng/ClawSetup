@@ -54,7 +54,7 @@ export default function NPSSurvey() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: 20 }}
-        className="fixed bottom-6 right-6 z-[70] w-80 rounded-2xl shadow-neu p-5 bg-neu-bg"
+        className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-[70] w-[calc(100vw-2rem)] sm:w-80 max-w-sm rounded-2xl shadow-neu p-4 sm:p-5 bg-neu-bg"
       >
         {submitted ? (
           <div className="text-center py-4">
@@ -70,14 +70,14 @@ export default function NPSSurvey() {
                 </svg>
               </button>
             </div>
-            <div className="flex gap-1 mb-3">
+            <div className="flex flex-wrap gap-1.5 sm:gap-1 mb-3 justify-center">
               {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
                 <button
                   key={n}
                   onClick={() => setScore(n)}
                   aria-label={`Score ${n} out of 10`}
                   aria-pressed={score === n}
-                  className={`w-7 h-7 rounded-lg text-xs font-medium transition-all ${
+                  className={`w-8 h-8 sm:w-7 sm:h-7 rounded-lg text-xs font-medium transition-all ${
                     score === n
                       ? "bg-brand-500 text-white shadow-sm"
                       : "shadow-neu-xs text-neu-muted hover:text-neu-text"
@@ -87,7 +87,7 @@ export default function NPSSurvey() {
                 </button>
               ))}
             </div>
-            <div className="flex justify-between text-[10px] text-neu-muted mb-3">
+            <div className="flex justify-between text-xs text-neu-muted mb-3">
               <span>Not likely</span>
               <span>Very likely</span>
             </div>

@@ -78,7 +78,7 @@ export default async function AnalyticsPage() {
 
       {/* NPS Score */}
       {npsScore !== null && (
-        <div className="rounded-2xl shadow-neu p-6 bg-neu-bg mb-6 flex items-center gap-6">
+        <div className="rounded-2xl shadow-neu p-6 bg-neu-bg mb-6 flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6">
           <div>
             <p className="text-sm text-neu-muted">{t("npsScore")}</p>
             <p className={`text-4xl font-bold ${npsScore >= 50 ? "text-green-600" : npsScore >= 0 ? "text-amber-600" : "text-red-600"}`}>
@@ -109,8 +109,8 @@ export default async function AnalyticsPage() {
             const avgMin = time ? Math.round(time.avgMs / 60000) : null;
 
             return (
-              <div key={step.id} className="flex items-center gap-3 text-sm">
-                <div className="w-48 truncate text-neu-text text-xs" title={step.title}>
+              <div key={step.id} className="space-y-1 sm:space-y-0 sm:flex sm:items-center sm:gap-3 text-sm py-1">
+                <div className="sm:w-48 truncate text-neu-text text-xs" title={step.title}>
                   {step.module.title} &gt; {step.title}
                 </div>
                 <div className="flex-1 h-6 rounded-lg shadow-neu-inset-sm overflow-hidden relative">
@@ -122,20 +122,22 @@ export default async function AnalyticsPage() {
                     {count} ({pct}%)
                   </span>
                 </div>
-                <div className="w-16 text-xs text-neu-muted text-center" title={t("aiRequests")}>
-                  AI: {aiCount}
-                </div>
-                <div className="w-16 text-xs text-neu-muted text-center" title={t("helpful")}>
-                  {fbPct !== null ? `${fbPct}%` : "---"}
-                </div>
-                <div className="w-16 text-xs text-neu-muted text-center" title={t("avgTime")}>
-                  {avgMin !== null ? `${avgMin}m` : "---"}
+                <div className="flex sm:contents gap-3 text-xs text-neu-muted">
+                  <div className="sm:w-16 sm:text-center" title={t("aiRequests")}>
+                    AI: {aiCount}
+                  </div>
+                  <div className="sm:w-16 sm:text-center" title={t("helpful")}>
+                    {fbPct !== null ? `${fbPct}%` : "---"}
+                  </div>
+                  <div className="sm:w-16 sm:text-center" title={t("avgTime")}>
+                    {avgMin !== null ? `${avgMin}m` : "---"}
+                  </div>
                 </div>
               </div>
             );
           })}
         </div>
-        <div className="flex items-center gap-3 text-xs text-neu-muted mt-4 pt-3 border-t border-neu-dark/10">
+        <div className="hidden sm:flex items-center gap-3 text-xs text-neu-muted mt-4 pt-3 border-t border-neu-dark/10">
           <div className="w-48">{t("step")}</div>
           <div className="flex-1 text-center">{t("completions")}</div>
           <div className="w-16 text-center">{t("aiReqs")}</div>

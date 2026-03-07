@@ -237,7 +237,8 @@
     "statusTrialing": "Trialing",
     "statusCanceled": "Canceled",
     "statusInactive": "Inactive",
-    "noPayments": "No payments yet."
+    "noPayments": "No payments yet.",
+    "periodEnds": "Current period ends"
   },
   "certificates": {
     "title": "Certificates",

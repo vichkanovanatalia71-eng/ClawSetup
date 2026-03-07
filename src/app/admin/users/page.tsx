@@ -36,8 +36,8 @@ export default async function UsersPage() {
   return (
     <div>
       <h1 className="text-2xl font-bold text-neu-text mb-6">{t("users")}</h1>
-      <div className="rounded-2xl shadow-neu bg-neu-bg overflow-hidden">
-        <table className="w-full text-sm">
+      <div className="rounded-2xl shadow-neu bg-neu-bg overflow-hidden overflow-x-auto">
+        <table className="w-full text-sm min-w-[700px]">
           <thead>
             <tr className="border-b border-neu-dark/15">
               <th className="text-left px-5 py-4 font-medium text-neu-muted">{t("email")}</th>

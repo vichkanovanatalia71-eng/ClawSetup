@@ -18,7 +18,7 @@ export default function Header() {
       <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:z-[60] focus:top-2 focus:left-2 focus:px-4 focus:py-2 focus:bg-brand-600 focus:text-white focus:rounded-lg focus:text-sm focus:font-medium">
         {t("skipToContent")}
       </a>
-      <nav className="max-w-7xl mx-auto bg-[#e0e5ec] rounded-2xl shadow-neu-sm px-6">
+      <nav className="max-w-7xl mx-auto bg-[#e0e5ec] rounded-2xl shadow-neu-sm px-3 sm:px-6">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
             <Link href="/" className="flex items-center gap-3">
@@ -96,7 +96,7 @@ export default function Header() {
               aria-label={menuOpen ? t("closeMenu") : t("openMenu")}
               aria-expanded={menuOpen}
               aria-controls="mobile-nav"
-              className="neu-btn w-10 h-10 !p-0 rounded-xl flex items-center justify-center"
+              className="neu-btn w-11 h-11 !p-0 rounded-xl flex items-center justify-center"
             >
               <svg className="h-5 w-5 text-neu-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                 {menuOpen ? (

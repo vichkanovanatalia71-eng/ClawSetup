@@ -237,7 +237,8 @@
     "statusTrialing": "Пробний період",
     "statusCanceled": "Скасована",
     "statusInactive": "Неактивна",
-    "noPayments": "Оплат поки немає."
+    "noPayments": "Оплат поки немає.",
+    "periodEnds": "Поточний період закінчується"
   },
   "certificates": {
     "title": "Сертифікати",

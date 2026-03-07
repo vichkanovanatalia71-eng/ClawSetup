@@ -89,12 +89,14 @@ export default function StepContent({
               className="w-full aspect-video"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
+              loading="lazy"
             />
           ) : videoUrl.includes("loom.com") ? (
             <iframe
               src={videoUrl.replace("/share/", "/embed/")}
               className="w-full aspect-video"
               allowFullScreen
+              loading="lazy"
             />
           ) : (
             <video src={videoUrl} controls className="w-full aspect-video" />

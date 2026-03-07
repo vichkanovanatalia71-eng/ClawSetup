@@ -2,7 +2,7 @@ import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/auth";
 import { getTranslations } from "next-intl/server";
-import Link from "next/link";
+import AdminShell from "./AdminShell";
 
 export default async function AdminLayout({
   children,
@@ -33,27 +33,8 @@ export default async function AdminLayout({
   ];
 
   return (
-    <div className="flex min-h-[calc(100vh-64px)] bg-neu-bg">
-      <aside className="w-60 p-4">
-        <div className="rounded-2xl shadow-neu p-4 bg-neu-bg h-full">
-          <h2 className="text-lg font-bold text-neu-text mb-6 px-3">{t("panelTitle")}</h2>
-          <nav className="space-y-1">
-            {navItems.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-neu-muted hover:shadow-neu-flat hover:text-neu-text transition-all duration-200"
-              >
-                <svg className="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d={item.icon} />
-                </svg>
-                {item.label}
-              </Link>
-            ))}
-          </nav>
-        </div>
-      </aside>
-      <div className="flex-1 p-8">{children}</div>
-    </div>
+    <AdminShell navItems={navItems} panelTitle={t("panelTitle")}>
+      {children}
+    </AdminShell>
   );
 }

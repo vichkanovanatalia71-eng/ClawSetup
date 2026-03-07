@@ -59,7 +59,7 @@ export default async function RevenuePage() {
     <div>
       <h1 className="text-2xl font-bold text-neu-text mb-6">{t("revenueDashboard")}</h1>
 
-      <div className="grid md:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         {[
           { label: t("mrr"), value: `$${mrr.toLocaleString()}`, color: "text-green-600" },
           { label: t("arr"), value: `$${arr.toLocaleString()}`, color: "text-blue-600" },

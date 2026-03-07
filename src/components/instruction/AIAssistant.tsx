@@ -432,7 +432,7 @@ export default function AIAssistant({ stepId }: AIAssistantProps) {
             <img
               src={imagePreview}
               alt="Upload preview"
-              className="h-16 rounded-xl shadow-neu-xs"
+              className="h-12 sm:h-16 rounded-xl shadow-neu-xs"
             />
             <button
               onClick={() => {
